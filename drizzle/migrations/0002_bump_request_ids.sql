@@ -1,0 +1,1 @@
+alter table public.song_requests alter column id restart with 1230001;

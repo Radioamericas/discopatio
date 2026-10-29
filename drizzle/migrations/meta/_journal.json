@@ -15,6 +15,13 @@
       "when": 1793311656351,
       "tag": "0001_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793311985829,
+      "tag": "0002_bump_request_ids",
+      "breakpoints": true
     }
   ]
 }
