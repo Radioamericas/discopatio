@@ -1,14 +1,86 @@
 [
-  {"capability": "code", "source": "Manus React+tRPC+Express", "outcome": "port to TanStack Start routes and server functions", "status": "in_progress", "next_action": "port pages"},
-  {"capability": "schema", "source": "drizzle/schema.ts (MySQL, 9 tables)", "outcome": "migrate to Lovable Cloud Postgres", "status": "in_progress", "next_action": "migration"},
-  {"capability": "records", "source": "Manus MySQL", "outcome": "migrate", "status": "pending", "next_action": "user exports tables from Manus"},
-  {"capability": "auth identities", "source": "Manus OAuth owner account + shared team codes", "outcome": "owner -> Lovable email/password with admin role; team codes kept as signed cookie", "status": "in_progress", "next_action": "owner signs up, grant admin role"},
-  {"capability": "authorization", "source": "teamOnly / ownerOnly procedures", "outcome": "server-side checks in server functions; RLS denies direct access", "status": "in_progress", "next_action": "verify"},
-  {"capability": "uploaded files", "source": "Manus storage proxy (unused by app pages)", "outcome": "not used; logo bundled", "status": "accepted", "next_action": "none"},
-  {"capability": "external providers", "source": "iTunes Search API", "outcome": "preserve", "status": "in_progress", "next_action": "verify"},
-  {"capability": "public endpoints/callbacks", "source": "/api/oauth/callback (Manus auth)", "outcome": "replaced by Lovable auth", "status": "accepted", "next_action": "none"},
-  {"capability": "schedules", "source": "none used", "outcome": "none", "status": "accepted", "next_action": "none"},
-  {"capability": "secrets", "source": "JWT_SECRET (cookie signing)", "outcome": "new generated SESSION_SECRET", "status": "in_progress", "next_action": "generate"},
-  {"capability": "cutover", "source": "manus.space domain", "outcome": "publish on Lovable, point domain", "status": "pending", "next_action": "user publishes"},
-  {"capability": "verification", "source": "-", "outcome": "-", "status": "pending", "next_action": "run checks"}
+ {
+  "capability": "code",
+  "source": "Manus React+tRPC+Express",
+  "outcome": "port to TanStack Start routes and server functions",
+  "status": "verified",
+  "next_action": "none"
+ },
+ {
+  "capability": "schema",
+  "source": "drizzle/schema.ts (MySQL, 9 tables)",
+  "outcome": "migrate to Lovable Cloud Postgres",
+  "status": "verified",
+  "next_action": "none"
+ },
+ {
+  "capability": "records",
+  "source": "Manus MySQL",
+  "outcome": "migrate",
+  "status": "pending",
+  "next_action": "user exports tables from Manus"
+ },
+ {
+  "capability": "auth identities",
+  "source": "Manus OAuth owner account + shared team codes",
+  "outcome": "owner -> Lovable email/password with admin role; team codes kept as signed cookie",
+  "status": "pending",
+  "next_action": "owner creates account at /admin (first account becomes owner)"
+ },
+ {
+  "capability": "authorization",
+  "source": "teamOnly / ownerOnly procedures",
+  "outcome": "server-side checks in server functions; RLS denies direct access",
+  "status": "verified",
+  "next_action": "none"
+ },
+ {
+  "capability": "uploaded files",
+  "source": "Manus storage proxy (unused by app pages)",
+  "outcome": "not used; logo bundled",
+  "status": "accepted",
+  "next_action": "none"
+ },
+ {
+  "capability": "external providers",
+  "source": "iTunes Search API",
+  "outcome": "preserve",
+  "status": "verified",
+  "next_action": "none"
+ },
+ {
+  "capability": "public endpoints/callbacks",
+  "source": "/api/oauth/callback (Manus auth)",
+  "outcome": "replaced by Lovable auth",
+  "status": "accepted",
+  "next_action": "none"
+ },
+ {
+  "capability": "schedules",
+  "source": "none used",
+  "outcome": "none",
+  "status": "accepted",
+  "next_action": "none"
+ },
+ {
+  "capability": "secrets",
+  "source": "JWT_SECRET (cookie signing)",
+  "outcome": "new generated SESSION_SECRET",
+  "status": "verified",
+  "next_action": "none"
+ },
+ {
+  "capability": "cutover",
+  "source": "manus.space domain",
+  "outcome": "publish on Lovable, point domain",
+  "status": "pending",
+  "next_action": "user publishes"
+ },
+ {
+  "capability": "verification",
+  "source": "-",
+  "outcome": "-",
+  "status": "partial",
+  "next_action": "owner sign-in not yet exercised; records import pending"
+ }
 ]
