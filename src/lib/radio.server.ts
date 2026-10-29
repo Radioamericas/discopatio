@@ -1,0 +1,94 @@
+// Server-only helpers for Radio Patio: code-based sessions, owner check, request metadata.
+import { createClient } from "@supabase/supabase-js";
+import { getRequestHeader, useSession } from "@tanstack/react-start/server";
+import type { Database } from "@/integrations/supabase/types";
+
+// Permanent team codes (kept from the original app).
+export const TEAM_ACCESS_CODES = ["4719RADIEROS2026", "VZXT5D4YGB0XR90P1F62F"] as const;
+export const LEGACY_SINGLE_USE_CODE = "NV4SXULY75CS1DABNGXD0";
+export const PUBLIC_ACCESS_CODE = "JUEVES";
+
+export function isTeamCode(value: string) {
+  const v = value.trim().toUpperCase();
+  return TEAM_ACCESS_CODES.some((c) => c === v);
+}
+
+function sessionConfig(name: string, maxAge: number) {
+  const password = process.env["SESSION_SECRET"];
+  if (!password) throw new Error("SESSION_SECRET missing");
+  return {
+    password,
+    name,
+    maxAge,
+    cookie: { httpOnly: true, secure: true, sameSite: "none" as const, path: "/" },
+  };
+}
+
+export const teamSession = () =>
+  useSession<{ team?: boolean }>(sessionConfig("disco_patio_team_session", 60 * 60 * 24 * 30));
+export const publicSession = () =>
+  useSession<{ granted?: boolean }>(sessionConfig("disco_patio_public_access", 60 * 60 * 24 * 365));
+
+export async function hasTeamSession() {
+  const s = await teamSession();
+  return s.data.team === true;
+}
+export async function hasPublicSession() {
+  const s = await publicSession();
+  return s.data.granted === true;
+}
+
+/** Returns true when the request carries a valid signed-in owner (admin role). */
+export async function isOwnerRequest(): Promise<boolean> {
+  const auth = getRequestHeader("authorization");
+  if (!auth?.startsWith("Bearer ")) return false;
+  const token = auth.slice(7);
+  if (token.split(".").length !== 3) return false;
+  const url = process.env["SUPABASE_URL"]!;
+  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
+  const client = createClient<Database>(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      headers: { Authorization: `Bearer ${token}` },
+      fetch: (input, init) => {
+        const h = new Headers(init?.headers);
+        h.set("apikey", key);
+        return fetch(input, { ...init, headers: h });
+      },
+    },
+  });
+  const { data, error } = await client.auth.getClaims(token);
+  if (error || !data?.claims?.sub) return false;
+  const { data: ok } = await client.rpc("has_role", { _user_id: data.claims.sub, _role: "admin" });
+  return ok === true;
+}
+
+export async function getAccess() {
+  const [owner, team] = await Promise.all([isOwnerRequest(), hasTeamSession()]);
+  return { owner, team: team || owner };
+}
+
+export async function getAdmin() {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return supabaseAdmin;
+}
+
+async function sha256Hex(text: string) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+export async function getActivityMetadata() {
+  const ua = String(getRequestHeader("user-agent") ?? "").toLowerCase();
+  const ip = String(getRequestHeader("cf-connecting-ip") ?? getRequestHeader("x-forwarded-for") ?? "unknown").split(",")[0]?.trim() ?? "unknown";
+  const day = new Date().toISOString().slice(0, 10);
+  const ipHash = (await sha256Hex(`${process.env["SESSION_SECRET"] ?? "activity-salt"}|${day}|${ip}`)).slice(0, 32);
+  const deviceType = /tablet|ipad/.test(ua) ? "tablet" : /mobile|android|iphone/.test(ua) ? "móvil" : "ordenador";
+  const browser = /edg\//.test(ua) ? "Edge" : /chrome\//.test(ua) ? "Chrome" : /firefox\//.test(ua) ? "Firefox" : /safari\//.test(ua) ? "Safari" : "Otro";
+  return { ip_hash: ipHash, device_type: deviceType, browser };
+}
+
+export function getCountry() {
+  const c = String(getRequestHeader("cf-ipcountry") ?? getRequestHeader("x-country-code") ?? "XX").toUpperCase();
+  return /^[A-Z]{2}$/.test(c) ? c : "XX";
+}
