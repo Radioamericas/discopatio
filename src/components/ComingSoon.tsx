@@ -62,7 +62,7 @@ export function ComingSoon() {
       </div>
 
       <footer className="border-t border-white/10 px-5 py-4 text-center">
-        <Link to="/admin" className="inline-flex min-h-11 items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500 transition hover:text-cyan-200 sm:text-xs">
+        <Link to="/admin" className="inline-flex min-h-11 items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400 transition hover:text-cyan-200 sm:text-xs">
           <Users className="h-3.5 w-3.5" aria-hidden="true" />
           Acceso equipo y admins
         </Link>

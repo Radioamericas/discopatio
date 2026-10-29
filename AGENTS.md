@@ -11,3 +11,4 @@
 
 - All app tables are reachable only from server functions in src/lib/radio.functions.ts (RLS on, no policies) — the public site has no user accounts, so access is enforced in server code.
 - Team access uses shared codes stored in an encrypted session cookie; the owner is a Lovable Cloud account with the admin role in user_roles — this mirrors the original app's two access levels.
+- The public site's frozen/coming-soon state is driven only by SITE_LOCKED in src/lib/site-lock.ts, so reopening the site is a one-flag change and /admin is never locked out.
