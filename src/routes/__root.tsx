@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
+  useRouterState,
   Link,
   createRootRouteWithContext,
   useRouter,
@@ -15,6 +16,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import CookieConsent from "@/components/CookieConsent";
+import { ComingSoon } from "@/components/ComingSoon";
+import { isSiteLocked } from "@/lib/site-lock";
 
 function NotFoundComponent() {
   return (
@@ -116,14 +119,18 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: state => state.location.pathname });
+  const locked = isSiteLocked(pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster theme="dark" />
       <AnalyticsTracker />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <CookieConsent />
+      <div className={locked ? "site-lock-backdrop" : undefined} aria-hidden={locked || undefined} inert={locked}>
+        <Outlet />
+      </div>
+      {locked ? <ComingSoon /> : <CookieConsent />}
     </QueryClientProvider>
   );
 }
