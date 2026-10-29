@@ -234,7 +234,7 @@ export function AdminPage() {
 }
 
 function OwnerAccessNotice() {
-  return <section className="mt-5 rounded-3xl border border-amber-300/20 bg-amber-300/[0.06] p-4 sm:p-5"><div className="flex items-start gap-3"><KeyRound className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" /><div><p className="font-semibold text-white">Panel de propietario</p><p className="mt-1 text-xs leading-5 text-slate-400">Has entrado con código de equipo. Para ver estadísticas privadas y gestionar códigos de personas, temporizador, bloqueo y banner, cierra sesión y entra con el código de propietario.</p><p className="mt-3 rounded-xl border border-amber-300/15 bg-[#07111f]/60 px-3 py-2 font-mono text-[11px] text-amber-100">Acceso propietario disponible en este mismo panel</p></div></div></section>;
+  return <section className="mt-5 rounded-3xl border border-amber-300/20 bg-amber-300/[0.06] p-4 sm:p-5"><div className="flex items-start gap-3"><KeyRound className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" /><div><p className="font-semibold text-white">Panel de propietario</p><p className="mt-1 text-xs leading-5 text-slate-400">Has entrado con código de equipo. Para ver estadísticas privadas y gestionar códigos de personas, temporizador, bloqueo y banner, cierra sesión y entra con la cuenta propietaria.</p><p className="mt-3 rounded-xl border border-amber-300/15 bg-[#07111f]/60 px-3 py-2 font-mono text-[11px] text-amber-100">Acceso propietario disponible en este mismo panel</p></div></div></section>;
 }
 
 function OwnerControls({ control, codes, onSave, onCreate }: { control: any; codes: Array<{ code: string; studentName: string; usedAt: string | null }>; onSave: (value: any) => void; onCreate: (studentName: string) => void }) {
