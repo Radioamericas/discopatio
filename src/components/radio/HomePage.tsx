@@ -78,7 +78,6 @@ function PublicAccessGate({ onUnlock, loading = false }: { onUnlock: (code: stri
 }
 
 export function HomePage() {
-export function HomePage() {
   const [searchText, setSearchText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
