@@ -14,16 +14,289 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      access_codes: {
+        Row: {
+          code: string
+          used_at: string | null
+        }
+        Insert: {
+          code: string
+          used_at?: string | null
+        }
+        Update: {
+          code?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      active_visitors: {
+        Row: {
+          browser: string | null
+          device_type: string | null
+          ip_hash: string | null
+          last_seen: string
+          session_id: string
+        }
+        Insert: {
+          browser?: string | null
+          device_type?: string | null
+          ip_hash?: string | null
+          last_seen?: string
+          session_id: string
+        }
+        Update: {
+          browser?: string | null
+          device_type?: string | null
+          ip_hash?: string | null
+          last_seen?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
+      analytics_events: {
+        Row: {
+          clicks: number
+          country: string
+          created_at: string
+          day: string
+          device_type: string
+          duration_seconds: number
+          event_type: Database["public"]["Enums"]["analytics_event_type"]
+          id: number
+          page: string
+        }
+        Insert: {
+          clicks?: number
+          country?: string
+          created_at?: string
+          day: string
+          device_type?: string
+          duration_seconds?: number
+          event_type: Database["public"]["Enums"]["analytics_event_type"]
+          id?: number
+          page: string
+        }
+        Update: {
+          clicks?: number
+          country?: string
+          created_at?: string
+          day?: string
+          device_type?: string
+          duration_seconds?: number
+          event_type?: Database["public"]["Enums"]["analytics_event_type"]
+          id?: number
+          page?: string
+        }
+        Relationships: []
+      }
+      request_activity: {
+        Row: {
+          access_code_used: boolean
+          browser: string | null
+          device_type: string | null
+          ip_hash: string | null
+          request_id: number
+        }
+        Insert: {
+          access_code_used?: boolean
+          browser?: string | null
+          device_type?: string | null
+          ip_hash?: string | null
+          request_id: number
+        }
+        Update: {
+          access_code_used?: boolean
+          browser?: string | null
+          device_type?: string | null
+          ip_hash?: string | null
+          request_id?: number
+        }
+        Relationships: []
+      }
+      site_control: {
+        Row: {
+          banner_color: string
+          banner_enabled: boolean
+          banner_position: Database["public"]["Enums"]["banner_position"]
+          banner_text: string | null
+          blocked: boolean
+          id: number
+          open_override: boolean
+          unlock_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          banner_color?: string
+          banner_enabled?: boolean
+          banner_position?: Database["public"]["Enums"]["banner_position"]
+          banner_text?: string | null
+          blocked?: boolean
+          id: number
+          open_override?: boolean
+          unlock_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          banner_color?: string
+          banner_enabled?: boolean
+          banner_position?: Database["public"]["Enums"]["banner_position"]
+          banner_text?: string | null
+          blocked?: boolean
+          id?: number
+          open_override?: boolean
+          unlock_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_feedback: {
+        Row: {
+          created_at: string
+          id: number
+          rating: number
+          request_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          rating: number
+          request_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          rating?: number
+          request_id?: number
+        }
+        Relationships: []
+      }
+      song_requests: {
+        Row: {
+          album: string | null
+          artist: string
+          course: string | null
+          created_at: string
+          dedication: string | null
+          id: number
+          notes: string | null
+          requester_name: string | null
+          song_title: string
+          source_url: string | null
+          status: Database["public"]["Enums"]["request_status"]
+          terms_accepted: boolean
+          terms_version: string
+          updated_at: string
+          year: number | null
+        }
+        Insert: {
+          album?: string | null
+          artist: string
+          course?: string | null
+          created_at?: string
+          dedication?: string | null
+          id?: number
+          notes?: string | null
+          requester_name?: string | null
+          song_title: string
+          source_url?: string | null
+          status?: Database["public"]["Enums"]["request_status"]
+          terms_accepted?: boolean
+          terms_version?: string
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          album?: string | null
+          artist?: string
+          course?: string | null
+          created_at?: string
+          dedication?: string | null
+          id?: number
+          notes?: string | null
+          requester_name?: string | null
+          song_title?: string
+          source_url?: string | null
+          status?: Database["public"]["Enums"]["request_status"]
+          terms_accepted?: boolean
+          terms_version?: string
+          updated_at?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      student_access_codes: {
+        Row: {
+          code: string
+          created_at: string
+          student_name: string
+          used_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          student_name: string
+          used_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          student_name?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      analytics_summary: {
+        Args: never
+        Returns: {
+          clicks: number
+          country: string
+          day: string
+          device_type: string
+          event_type: string
+          page: string
+          sessions: number
+          total_seconds: number
+          views: number
+        }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      redeem_access_code: { Args: { _code: string }; Returns: boolean }
+      redeem_student_access_code: { Args: { _code: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      analytics_event_type: "page_view" | "session_end" | "click"
+      app_role: "admin" | "user"
+      banner_position: "top" | "middle" | "bottom"
+      request_status: "pending" | "selected" | "played" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +423,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      analytics_event_type: ["page_view", "session_end", "click"],
+      app_role: ["admin", "user"],
+      banner_position: ["top", "middle", "bottom"],
+      request_status: ["pending", "selected", "played", "rejected"],
+    },
   },
 } as const
