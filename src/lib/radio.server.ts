@@ -80,7 +80,7 @@ async function sha256Hex(text: string) {
 
 export async function getActivityMetadata() {
   const ua = String(getRequestHeader("user-agent") ?? "").toLowerCase();
-  const ip = String(getRequestHeader("cf-connecting-ip") ?? getRequestHeader("x-forwarded-for") ?? "unknown").split(",")[0].trim();
+  const ip = String(getRequestHeader("cf-connecting-ip") ?? getRequestHeader("x-forwarded-for") ?? "unknown").split(",")[0]?.trim() ?? "unknown";
   const day = new Date().toISOString().slice(0, 10);
   const ipHash = (await sha256Hex(`${process.env["SESSION_SECRET"] ?? "activity-salt"}|${day}|${ip}`)).slice(0, 32);
   const deviceType = /tablet|ipad/.test(ua) ? "tablet" : /mobile|android|iphone/.test(ua) ? "móvil" : "ordenador";

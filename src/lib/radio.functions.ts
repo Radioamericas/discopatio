@@ -114,7 +114,7 @@ export const recordAnalytics = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export type Track = { id: string; title: string; artist: string; album: string; year?: number; previewUrl?: string; artworkUrl?: string; sourceUrl?: string; explicitness: "explicit" | "cleaned" | "notExplicit" | "unknown" };
+export type Track = { id: string; title: string; artist: string; album: string; year?: number | undefined; previewUrl?: string | undefined; artworkUrl?: string | undefined; sourceUrl?: string | undefined; explicitness: "explicit" | "cleaned" | "notExplicit" | "unknown" };
 
 export const searchMusic = createServerFn({ method: "GET" })
   .inputValidator((d: { query: string }) => z.object({ query: z.string().trim().min(2).max(100) }).parse(d))
@@ -215,7 +215,7 @@ export const adminListRequests = createServerFn({ method: "GET" }).handler(async
 });
 
 export const updateRequest = createServerFn({ method: "POST" })
-  .inputValidator((d: { id: number; status: RequestItem["status"]; notes?: string }) => z.object({ id: z.number().int(), status: z.enum(["pending", "selected", "played", "rejected"]), notes: z.string().max(1000).optional() }).parse(d))
+  .inputValidator((d: { id: number; status: RequestItem["status"]; notes?: string | undefined }) => z.object({ id: z.number().int(), status: z.enum(["pending", "selected", "played", "rejected"]), notes: z.string().max(1000).optional() }).parse(d))
   .handler(async ({ data }) => {
     await requireTeam();
     const db = await getAdmin();
@@ -271,15 +271,17 @@ export const ownerUpdateControl = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireOwner();
     const db = await getAdmin();
-    const patch: Record<string, unknown> = { id: 1, updated_at: new Date().toISOString() };
-    if (data.blocked !== undefined) patch.blocked = data.blocked;
-    if (data.openOverride !== undefined) patch.open_override = data.openOverride;
-    if (data.unlockAt !== undefined) patch.unlock_at = data.unlockAt;
-    if (data.bannerEnabled !== undefined) patch.banner_enabled = data.bannerEnabled;
-    if (data.bannerText !== undefined) patch.banner_text = data.bannerText;
-    if (data.bannerPosition !== undefined) patch.banner_position = data.bannerPosition;
-    if (data.bannerColor !== undefined) patch.banner_color = data.bannerColor;
-    await db.from("site_control").upsert(patch as never);
+    const patch = {
+      id: 1, updated_at: new Date().toISOString(),
+      ...(data.blocked !== undefined && { blocked: data.blocked }),
+      ...(data.openOverride !== undefined && { open_override: data.openOverride }),
+      ...(data.unlockAt !== undefined && { unlock_at: data.unlockAt }),
+      ...(data.bannerEnabled !== undefined && { banner_enabled: data.bannerEnabled }),
+      ...(data.bannerText !== undefined && { banner_text: data.bannerText }),
+      ...(data.bannerPosition !== undefined && { banner_position: data.bannerPosition }),
+      ...(data.bannerColor !== undefined && { banner_color: data.bannerColor }),
+    };
+    await db.from("site_control").upsert(patch);
     return readControl();
   });
 

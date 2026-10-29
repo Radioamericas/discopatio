@@ -36,7 +36,7 @@ function PauseGate({ unlockAt, onUnlock, loading = false }: { unlockAt: number; 
   const seconds = totalSeconds % 60;
   const submitCode = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (code.trim().length < 6) return toast.error("Código incompleto", { description: "Introduce un código de equipo, propietario o alumno." });
+    if (code.trim().length < 6) { toast.error("Código incompleto", { description: "Introduce un código de equipo, propietario o alumno." }); return; }
     onUnlock(code.trim().toUpperCase());
   };
 
@@ -170,8 +170,8 @@ export function HomePage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!songTitle.trim() || !artist.trim() || !requesterName.trim() || !course.trim()) return toast.error("Faltan datos", { description: "Indica la canción, el nombre del alumno y el curso." });
-    if (!termsAccepted) return toast.error("Falta aceptar los términos", { description: "Marca la casilla para poder enviar tus datos." });
+    if (!songTitle.trim() || !artist.trim() || !requesterName.trim() || !course.trim()) { toast.error("Faltan datos", { description: "Indica la canción, el nombre del alumno y el curso." }); return; }
+    if (!termsAccepted) { toast.error("Falta aceptar los términos", { description: "Marca la casilla para poder enviar tus datos." }); return; }
     if (selectedSongIsExplicit && !explicitWarningAccepted) { setExplicitPopupOpen(true); return; }
     setShowSubmissionLoader(true);
     submissionLoaderStartedAt.current = Date.now();
