@@ -231,3 +231,29 @@
   .radio-dynamic-glow { animation: none; }
   .submission-loader-words span { animation: none; }
 }
+
+.migration-marquee {
+  overflow: hidden;
+  border-bottom: 1px solid color-mix(in oklch, var(--primary) 40%, transparent);
+  background: linear-gradient(90deg, oklch(0.35 0.15 330 / 0.55), oklch(0.4 0.12 215 / 0.55));
+  padding: 0.9rem 0;
+}
+.migration-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: migration-slide 22s linear infinite;
+}
+.migration-marquee-track span {
+  padding-inline: 3rem;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: clamp(1.15rem, 3.2vw, 2rem);
+  letter-spacing: 0.02em;
+  color: var(--foreground);
+  text-shadow: 0 0 18px oklch(0.8 0.14 215 / 0.6);
+}
+@keyframes migration-slide {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) { .migration-marquee-track { animation-duration: 60s; } }
