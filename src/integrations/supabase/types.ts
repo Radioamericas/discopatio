@@ -29,6 +29,21 @@ export type Database = {
         }
         Relationships: []
       }
+      account_creation_permits: {
+        Row: {
+          email: string
+          expires_at: string
+        }
+        Insert: {
+          email: string
+          expires_at?: string
+        }
+        Update: {
+          email?: string
+          expires_at?: string
+        }
+        Relationships: []
+      }
       active_visitors: {
         Row: {
           browser: string | null

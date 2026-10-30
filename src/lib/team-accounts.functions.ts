@@ -25,7 +25,10 @@ export const ownerCreateUser = createServerFn({ method: "POST" })
       email: teamEmail(data.username), password: data.password, email_confirm: true,
       app_metadata: { provisioned_by_owner: true },
     });
-    if (error || !result.user) throw new Error("No se pudo crear la cuenta. Comprueba que el nombre no esté ocupado y usa una contraseña segura.");
+    if (error || !result.user) {
+      console.error("Team provisioning failed", error?.code, error?.status, error?.message);
+      throw new Error("No se pudo crear la cuenta. Comprueba que el nombre no esté ocupado y usa una contraseña segura.");
+    }
     return { username: data.username };
   });
 
