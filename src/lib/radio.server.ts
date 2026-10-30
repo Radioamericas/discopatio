@@ -39,11 +39,11 @@ export async function hasPublicSession() {
 }
 
 /** Returns true when the request carries a valid signed-in owner (admin role). */
-export async function isOwnerRequest(): Promise<boolean> {
+async function accountAccess(): Promise<{ owner: boolean; team: boolean }> {
   const auth = getRequestHeader("authorization");
-  if (!auth?.startsWith("Bearer ")) return false;
+  if (!auth?.startsWith("Bearer ")) return { owner: false, team: false };
   const token = auth.slice(7);
-  if (token.split(".").length !== 3) return false;
+  if (token.split(".").length !== 3) return { owner: false, team: false };
   const url = process.env["SUPABASE_URL"]!;
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
   const client = createClient<Database>(url, key, {
@@ -57,15 +57,24 @@ export async function isOwnerRequest(): Promise<boolean> {
       },
     },
   });
-  const { data, error } = await client.auth.getClaims(token);
-  if (error || !data?.claims?.sub) return false;
-  const { data: ok } = await client.rpc("has_role", { _user_id: data.claims.sub, _role: "admin" });
-  return ok === true;
+  const { data, error } = await client.auth.getUser(token);
+  if (error || !data.user) return { owner: false, team: false };
+  const { data: owner } = await client.rpc("has_role", { _user_id: data.user.id, _role: "admin" });
+  if (owner === true) return { owner: true, team: true };
+  const [{ data: role }, { data: profile }] = await Promise.all([
+    client.rpc("has_role", { _user_id: data.user.id, _role: "user" }),
+    client.from("profiles").select("id").eq("id", data.user.id).maybeSingle(),
+  ]);
+  return { owner: false, team: role === true && Boolean(profile) };
+}
+
+export async function isOwnerRequest(): Promise<boolean> {
+  return (await accountAccess()).owner;
 }
 
 export async function getAccess() {
-  const [owner, team] = await Promise.all([isOwnerRequest(), hasTeamSession()]);
-  return { owner, team: team || owner };
+  const [account, team] = await Promise.all([accountAccess(), hasTeamSession()]);
+  return { owner: account.owner, team: team || account.team };
 }
 
 export async function getAdmin() {
