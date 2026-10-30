@@ -29,6 +29,13 @@
       "when": 1793312914509,
       "tag": "0003_private_team_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793373064552,
+      "tag": "0004_block_self_service_registration",
+      "breakpoints": true
     }
   ]
 }
