@@ -5,7 +5,7 @@
  * "próximamente" screen. Team and admin paths stay reachable so the team can
  * keep working; flip SITE_LOCKED back to false to reopen the site.
  */
-export const SITE_LOCKED = true;
+export const SITE_LOCKED = false;
 
 /** Where visitors are sent for more information. */
 export const INFO_URL = "https://discopatio.lovable.app";
