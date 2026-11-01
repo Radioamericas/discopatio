@@ -47,7 +47,7 @@ async function requireOwner() {
 // ---------- Access ----------
 export const getSessionInfo = createServerFn({ method: "GET" }).handler(async () => {
   const access = await getAccess();
-  return { owner: access.owner, team: access.team, publicGranted: access.team || (await hasPublicSession()) };
+  return { owner: access.owner, team: access.team, publicGranted: true };
 });
 
 export const publicLogin = createServerFn({ method: "POST" })
@@ -174,7 +174,6 @@ export const createSongRequest = createServerFn({ method: "POST" })
   .inputValidator((d: z.input<typeof requestInput>) => requestInput.parse(d))
   .handler(async ({ data }) => {
     const access = await getAccess();
-    if (!access.team && !(await hasPublicSession())) throw new Error("Introduce el código público para enviar canciones.");
     if (isLikelyExplicitSong(data.songTitle, data.artist) && !data.explicitWarningAccepted) throw new Error("Esta canción parece contener contenido explícito. Confirma que quieres enviarla.");
     const pause = await pauseState();
     const code = data.accessCode?.toUpperCase();

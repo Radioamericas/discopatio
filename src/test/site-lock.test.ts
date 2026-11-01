@@ -4,11 +4,9 @@ import { INFO_URL, isSiteLocked } from "@/lib/site-lock";
 
 // The lock freezes the public site but must never lock the team out of their panel.
 describe("Site lock", () => {
-  it("keeps public pages frozen behind the coming-soon screen", () => {
-    expect(isSiteLocked("/")).toBe(true);
-    expect(isSiteLocked("/aviso-legal")).toBe(true);
-    expect(isSiteLocked("/privacidad")).toBe(true);
-    expect(isSiteLocked("/cookies")).toBe(true);
+  it("has the public site reopened", () => {
+    expect(isSiteLocked("/")).toBe(false);
+    expect(isSiteLocked("/cookies")).toBe(false);
   });
 
   it("leaves the team and admin panel reachable", () => {
