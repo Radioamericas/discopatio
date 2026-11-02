@@ -7,7 +7,7 @@ import logoAsset from "@/assets/logo_disco_patio.png.asset.json";
 const logoPath = logoAsset.url;
 const TICKER = "PRÓXIMAMENTE · RADIO PATIO LAS AMÉRICAS · NUEVA WEB DISCOPATIO";
 
-export function ComingSoon() {
+export function ComingSoon({ note }: { note?: string | null }) {
   useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -46,6 +46,13 @@ export function ComingSoon() {
           La nueva web de <strong className="text-white">Radio Patio Las Américas</strong> está cerrada mientras la preparamos.
           Las peticiones de canciones volverán muy pronto.
         </p>
+
+        {note && (
+          <div className="coming-soon-rise mt-5 w-full max-w-xl rounded-2xl border border-amber-300/25 bg-amber-300/[0.08] px-5 py-4 text-left" style={{ animationDelay: "380ms" }}>
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-amber-200/80">Nota del equipo</p>
+            <p className="mt-2 whitespace-pre-line text-sm leading-6 text-amber-50">{note}</p>
+          </div>
+        )}
 
         <div className="coming-soon-rise mt-8 w-full max-w-md rounded-2xl border border-blue-200/15 bg-blue-300/[0.07] px-5 py-4" style={{ animationDelay: "430ms" }}>
           <p className="text-xs uppercase tracking-[0.22em] text-blue-200/70">Para más info visita</p>
