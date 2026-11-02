@@ -18,6 +18,9 @@ import AnalyticsTracker from "@/components/AnalyticsTracker";
 import CookieConsent from "@/components/CookieConsent";
 import { ComingSoon } from "@/components/ComingSoon";
 import { isSiteLocked } from "@/lib/site-lock";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getRequestStatus } from "@/lib/radio.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -133,18 +136,27 @@ function RootComponent() {
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
-  const pathname = useRouterState({ select: state => state.location.pathname });
-  const locked = isSiteLocked(pathname);
-
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster theme="dark" />
       <AnalyticsTracker />
+      <LockableOutlet />
+    </QueryClientProvider>
+  );
+}
+
+function LockableOutlet() {
+  const pathname = useRouterState({ select: state => state.location.pathname });
+  const statusFn = useServerFn(getRequestStatus);
+  const status = useQuery({ queryKey: ["site-lock-status"], queryFn: () => statusFn(), refetchInterval: 60_000 });
+  const locked = isSiteLocked(pathname, Boolean(status.data?.siteLocked));
+  return (
+    <>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <div className={locked ? "site-lock-backdrop" : undefined} aria-hidden={locked || undefined} inert={locked}>
         <Outlet />
       </div>
-      {locked ? <ComingSoon /> : <CookieConsent />}
-    </QueryClientProvider>
+      {locked ? <ComingSoon note={status.data?.lockNote} /> : <CookieConsent />}
+    </>
   );
 }

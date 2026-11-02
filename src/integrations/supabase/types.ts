@@ -154,7 +154,9 @@ export type Database = {
           banner_text: string | null
           blocked: boolean
           id: number
+          lock_note: string | null
           open_override: boolean
+          site_locked: boolean
           unlock_at: string | null
           updated_at: string
         }
@@ -165,7 +167,9 @@ export type Database = {
           banner_text?: string | null
           blocked?: boolean
           id: number
+          lock_note?: string | null
           open_override?: boolean
+          site_locked?: boolean
           unlock_at?: string | null
           updated_at?: string
         }
@@ -176,7 +180,9 @@ export type Database = {
           banner_text?: string | null
           blocked?: boolean
           id?: number
+          lock_note?: string | null
           open_override?: boolean
+          site_locked?: boolean
           unlock_at?: string | null
           updated_at?: string
         }

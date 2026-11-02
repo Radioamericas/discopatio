@@ -4,7 +4,7 @@ import { getRequestHeader, useSession } from "@tanstack/react-start/server";
 import type { Database } from "@/integrations/supabase/types";
 
 // Permanent team codes (kept from the original app).
-export const TEAM_ACCESS_CODES = ["4719RADIEROS2026", "VZXT5D4YGB0XR90P1F62F"] as const;
+export const TEAM_ACCESS_CODES = ["4719RADIEROS2026", "VZXT5D4YGB0XR90P1F62F", "RCQAIM5CF8KCBT90OJ"] as const;
 export const LEGACY_SINGLE_USE_CODE = "NV4SXULY75CS1DABNGXD0";
 export const PUBLIC_ACCESS_CODE = "JUEVES";
 

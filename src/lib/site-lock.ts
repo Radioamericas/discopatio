@@ -13,8 +13,8 @@ export const INFO_URL = "https://discopatio.lovable.app";
 /** Paths that keep working while the site is locked. */
 const TEAM_PATH_PREFIXES = ["/admin", "/reset-password"];
 
-export function isSiteLocked(pathname: string): boolean {
-  if (!SITE_LOCKED) return false;
+export function isSiteLocked(pathname: string, lockedFromPanel = false): boolean {
+  if (!SITE_LOCKED && !lockedFromPanel) return false;
   const path = pathname.replace(/\/+$/, "") || "/";
   return !TEAM_PATH_PREFIXES.some(prefix => path === prefix || path.startsWith(`${prefix}/`));
 }
