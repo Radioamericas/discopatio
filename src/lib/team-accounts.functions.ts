@@ -21,8 +21,15 @@ export const ownerCreateUser = createServerFn({ method: "POST" })
     const { data: owner } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     requireAccountOwner(owner === true);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const email = teamEmail(data.username);
+    // The signup trigger only lets an insert through when a matching permit row exists,
+    // so the owner request is stamped here and consumed by that trigger.
+    const { error: permitError } = await supabaseAdmin
+      .from("account_creation_permits")
+      .upsert({ email, expires_at: new Date(Date.now() + 120_000).toISOString() }, { onConflict: "email" });
+    if (permitError) throw new Error("No se pudo preparar la creación de la cuenta.");
     const { data: result, error } = await supabaseAdmin.auth.admin.createUser({
-      email: teamEmail(data.username), password: data.password, email_confirm: true,
+      email, password: data.password, email_confirm: true,
       app_metadata: { provisioned_by_owner: true },
     });
     if (error || !result.user) {
