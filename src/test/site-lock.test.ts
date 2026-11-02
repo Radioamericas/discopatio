@@ -18,3 +18,10 @@ describe("Site lock", () => {
     expect(INFO_URL).toBe("https://discopatio.lovable.app");
   });
 });
+
+describe("panel lock", () => {
+  it("locks public pages but never the team panel", () => {
+    expect(isSiteLocked("/", true)).toBe(true);
+    expect(isSiteLocked("/admin", true)).toBe(false);
+  });
+});

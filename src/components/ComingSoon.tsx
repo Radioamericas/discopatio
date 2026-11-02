@@ -7,7 +7,7 @@ import logoAsset from "@/assets/logo_disco_patio.png.asset.json";
 const logoPath = logoAsset.url;
 const TICKER = "PRÓXIMAMENTE · RADIO PATIO LAS AMÉRICAS · NUEVA WEB DISCOPATIO";
 
-export function ComingSoon({ note }: { note?: string | null }) {
+export function ComingSoon({ note }: { note?: string | null | undefined }) {
   useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";

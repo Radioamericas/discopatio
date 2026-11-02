@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
-  control?: { siteLocked: boolean; lockNote: string | null };
+  control?: { siteLocked: boolean; lockNote: string | null } | undefined;
   onSave: (value: { siteLocked?: boolean; lockNote?: string | null }) => void;
 };
 
