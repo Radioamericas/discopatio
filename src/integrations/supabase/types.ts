@@ -155,6 +155,7 @@ export type Database = {
           blocked: boolean
           id: number
           lock_note: string | null
+          lock_reopen_at: string | null
           open_override: boolean
           popup_enabled: boolean
           popup_image_url: string | null
@@ -172,6 +173,7 @@ export type Database = {
           blocked?: boolean
           id: number
           lock_note?: string | null
+          lock_reopen_at?: string | null
           open_override?: boolean
           popup_enabled?: boolean
           popup_image_url?: string | null
@@ -189,6 +191,7 @@ export type Database = {
           blocked?: boolean
           id?: number
           lock_note?: string | null
+          lock_reopen_at?: string | null
           open_override?: boolean
           popup_enabled?: boolean
           popup_image_url?: string | null

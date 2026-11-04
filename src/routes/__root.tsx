@@ -159,7 +159,7 @@ function LockableOutlet() {
       <div className={locked ? "site-lock-backdrop" : undefined} aria-hidden={locked || undefined} inert={locked}>
         <Outlet />
       </div>
-      {locked ? <ComingSoon note={status.data?.lockNote} banner={status.data?.bannerEnabled ? status.data.bannerText : null} /> : <CookieConsent />}
+      {locked ? <ComingSoon note={status.data?.lockNote} reopenAt={status.data?.lockReopenAt ?? null} onReopen={() => status.refetch()} banner={status.data?.bannerEnabled ? status.data.bannerText : null} /> : <CookieConsent />}
       {d?.popupEnabled && !onTeamPage && <PopupNotice title={d.popupTitle} text={d.popupText} image={d.popupImageUrl} version={`${d.popupTitle ?? ""}|${d.popupText ?? ""}|${d.popupImageUrl?.length ?? 0}`} />}
     </>
   );

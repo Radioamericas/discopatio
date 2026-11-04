@@ -1,0 +1,1 @@
+ALTER TABLE public.site_control ADD COLUMN IF NOT EXISTS lock_reopen_at timestamptz;

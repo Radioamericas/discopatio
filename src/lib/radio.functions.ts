@@ -13,15 +13,15 @@ const HIDDEN_REQUEST_IDS = [1, 30001, 240001, 270001];
 type Control = {
   id: number; blocked: boolean; openOverride: boolean; unlockAt: string | null; bannerEnabled: boolean;
   bannerText: string | null; bannerPosition: "top" | "middle" | "bottom"; bannerColor: string; updatedAt: string;
-  siteLocked: boolean; lockNote: string | null;
+  siteLocked: boolean; lockNote: string | null; lockReopenAt: string | null;
   popupEnabled: boolean; popupTitle: string | null; popupText: string | null; popupImageUrl: string | null;
 };
 
 async function readControl(): Promise<Control> {
   const db = await getAdmin();
   const { data } = await db.from("site_control").select("*").eq("id", 1).maybeSingle();
-  const r = data ?? { id: 1, blocked: false, open_override: false, unlock_at: null, banner_enabled: false, banner_text: null, banner_position: "top" as const, banner_color: "cyan", updated_at: new Date().toISOString(), site_locked: false, lock_note: null, popup_enabled: false, popup_title: null, popup_text: null, popup_image_url: null };
-  return { id: r.id, blocked: r.blocked, openOverride: r.open_override, unlockAt: r.unlock_at, bannerEnabled: r.banner_enabled, bannerText: r.banner_text, bannerPosition: r.banner_position, bannerColor: r.banner_color, updatedAt: r.updated_at, siteLocked: r.site_locked, lockNote: r.lock_note, popupEnabled: r.popup_enabled, popupTitle: r.popup_title, popupText: r.popup_text, popupImageUrl: r.popup_image_url };
+  const r = data ?? { id: 1, blocked: false, open_override: false, unlock_at: null, banner_enabled: false, banner_text: null, banner_position: "top" as const, banner_color: "cyan", updated_at: new Date().toISOString(), site_locked: false, lock_note: null, lock_reopen_at: null as string | null, popup_enabled: false, popup_title: null, popup_text: null, popup_image_url: null };
+  return { id: r.id, blocked: r.blocked, openOverride: r.open_override, unlockAt: r.unlock_at, bannerEnabled: r.banner_enabled, bannerText: r.banner_text, bannerPosition: r.banner_position, bannerColor: r.banner_color, updatedAt: r.updated_at, siteLocked: r.site_locked && !(r.lock_reopen_at && Date.parse(r.lock_reopen_at) <= Date.now()), lockNote: r.lock_note, lockReopenAt: r.lock_reopen_at, popupEnabled: r.popup_enabled, popupTitle: r.popup_title, popupText: r.popup_text, popupImageUrl: r.popup_image_url };
 }
 
 async function pauseState() {
@@ -84,7 +84,7 @@ export const getRequestStatus = createServerFn({ method: "GET" }).handler(async 
     paused: p.paused, count: p.count, limit: p.limit,
     blocked: c.blocked, openOverride: c.openOverride, bannerEnabled: c.bannerEnabled, bannerText: c.bannerText,
     bannerPosition: c.bannerPosition, bannerColor: c.bannerColor,
-    siteLocked: c.siteLocked, lockNote: c.lockNote,
+    siteLocked: c.siteLocked, lockNote: c.lockNote, lockReopenAt: c.lockReopenAt ? new Date(c.lockReopenAt).getTime() : null,
     popupEnabled: c.popupEnabled, popupTitle: c.popupTitle, popupText: c.popupText, popupImageUrl: c.popupImageUrl, updatedAt: c.updatedAt,
     unlockAt: c.unlockAt ? new Date(c.unlockAt).getTime() : p.unlockAt,
   };
@@ -268,7 +268,7 @@ const controlInput = z.object({
   blocked: z.boolean().optional(), openOverride: z.boolean().optional(), unlockAt: z.string().datetime().nullable().optional(),
   bannerEnabled: z.boolean().optional(), bannerText: z.string().max(500).nullable().optional(),
   bannerPosition: z.enum(["top", "middle", "bottom"]).optional(), bannerColor: z.string().max(24).optional(),
-  siteLocked: z.boolean().optional(), lockNote: z.string().trim().max(500).nullable().optional(),
+  siteLocked: z.boolean().optional(), lockNote: z.string().trim().max(500).nullable().optional(), lockReopenAt: z.string().datetime().nullable().optional(),
   popupEnabled: z.boolean().optional(), popupTitle: z.string().trim().max(120).nullable().optional(),
   popupText: z.string().trim().max(1000).nullable().optional(),
   popupImageUrl: z.string().max(700_000).regex(/^(data:image\/(jpeg|png|webp);base64,|https:\/\/)/).nullable().optional(),
@@ -289,6 +289,7 @@ export const ownerUpdateControl = createServerFn({ method: "POST" })
       ...(data.bannerColor !== undefined && { banner_color: data.bannerColor }),
       ...(data.siteLocked !== undefined && { site_locked: data.siteLocked }),
       ...(data.lockNote !== undefined && { lock_note: data.lockNote || null }),
+      ...(data.lockReopenAt !== undefined && { lock_reopen_at: data.lockReopenAt }),
       ...(data.popupEnabled !== undefined && { popup_enabled: data.popupEnabled }),
       ...(data.popupTitle !== undefined && { popup_title: data.popupTitle || null }),
       ...(data.popupText !== undefined && { popup_text: data.popupText || null }),
