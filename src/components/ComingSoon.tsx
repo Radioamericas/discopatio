@@ -1,5 +1,6 @@
-import { useEffect } from "react";
-import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { AccountSignIn } from "@/components/radio/AccountAccess";
 import { ArrowUpRight, LockKeyhole, Users } from "lucide-react";
 import { INFO_URL } from "@/lib/site-lock";
 import logoAsset from "@/assets/logo_disco_patio.png.asset.json";
@@ -7,7 +8,9 @@ import logoAsset from "@/assets/logo_disco_patio.png.asset.json";
 const logoPath = logoAsset.url;
 const TICKER = "PRÓXIMAMENTE · RADIO PATIO LAS AMÉRICAS · NUEVA WEB DISCOPATIO";
 
-export function ComingSoon({ note }: { note?: string | null | undefined }) {
+export function ComingSoon({ note, banner }: { note?: string | null | undefined; banner?: string | null | undefined }) {
+  const [signIn, setSignIn] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -20,7 +23,7 @@ export function ComingSoon({ note }: { note?: string | null | undefined }) {
     <div className="coming-soon-scrim fixed inset-0 z-[300] flex flex-col overflow-y-auto text-slate-100" role="dialog" aria-modal="true" aria-labelledby="coming-soon-title">
       <div className="coming-soon-ticker" aria-hidden="true">
         <div className="coming-soon-ticker-track">
-          {[0, 1].map(i => <span key={i}>{TICKER}</span>)}
+          {[0, 1].map(i => <span key={i}>{banner || TICKER}</span>)}
         </div>
       </div>
 
@@ -69,6 +72,8 @@ export function ComingSoon({ note }: { note?: string | null | undefined }) {
       </div>
 
       <footer className="border-t border-white/10 px-5 py-4 text-center">
+        {signIn && <div className="mx-auto mb-4 w-full max-w-sm"><AccountSignIn onDone={() => navigate({ to: "/admin" })} /></div>}
+        <button type="button" onClick={() => setSignIn(v => !v)} className="mr-4 inline-flex min-h-11 items-center text-[11px] font-medium uppercase tracking-[0.16em] text-cyan-200 hover:text-white sm:text-xs">{signIn ? "Cerrar inicio de sesión" : "Iniciar sesión (usuario o correo)"}</button>
         <Link to="/admin" className="inline-flex min-h-11 items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400 transition hover:text-cyan-200 sm:text-xs">
           <Users className="h-3.5 w-3.5" aria-hidden="true" />
           Acceso equipo y admins
