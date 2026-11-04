@@ -38,7 +38,7 @@ export function PopupPanel({ control, onSave }: Props) {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    if (!file.type.startsWith("image/")) return toast.error("Elige una imagen");
+    if (!file.type.startsWith("image/")) { toast.error("Elige una imagen"); return; }
     try { setImage(await shrinkImage(file)); } catch { toast.error("No se pudo leer la imagen"); }
   };
 
