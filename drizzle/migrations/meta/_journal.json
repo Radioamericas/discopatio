@@ -57,6 +57,13 @@
       "when": 1793830585484,
       "tag": "0007_popup_banner",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793830797398,
+      "tag": "0008_lock_reopen_timer",
+      "breakpoints": true
     }
   ]
 }
