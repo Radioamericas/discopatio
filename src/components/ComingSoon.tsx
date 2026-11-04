@@ -8,8 +8,17 @@ import logoAsset from "@/assets/logo_disco_patio.png.asset.json";
 const logoPath = logoAsset.url;
 const TICKER = "PRÓXIMAMENTE · RADIO PATIO LAS AMÉRICAS · NUEVA WEB DISCOPATIO";
 
-export function ComingSoon({ note, banner }: { note?: string | null | undefined; banner?: string | null | undefined }) {
+export function ComingSoon({ note, banner, reopenAt, onReopen }: { note?: string | null | undefined; banner?: string | null | undefined; reopenAt?: number | null; onReopen?: () => void }) {
   const [signIn, setSignIn] = useState(false);
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    if (!reopenAt) return;
+    setNow(Date.now());
+    const t = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(t);
+  }, [reopenAt]);
+  const left = reopenAt && now !== null ? Math.max(0, reopenAt - now) : null;
+  useEffect(() => { if (left === 0) onReopen?.(); }, [left === 0]);
   const navigate = useNavigate();
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -49,6 +58,18 @@ export function ComingSoon({ note, banner }: { note?: string | null | undefined;
           La nueva web de <strong className="text-white">Radio Patio Las Américas</strong> está cerrada mientras la preparamos.
           Las peticiones de canciones volverán muy pronto.
         </p>
+
+        {reopenAt && left !== null && (
+          <div className="coming-soon-rise mt-6 w-full max-w-xl" style={{ animationDelay: "360ms" }}>
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-300/80">Reabrimos el {new Date(reopenAt).toLocaleString("es-ES", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</p>
+            <div className="mt-3 grid grid-cols-4 gap-2" aria-live="polite">
+              {([["Días", 86400000], ["Horas", 3600000], ["Min", 60000], ["Seg", 1000]] as const).map(([label, ms], i, arr) => {
+                const value = Math.floor((i === 0 ? left : left % arr[i - 1][1]) / ms);
+                return <div key={label} className="rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.07] py-3"><p className="font-mono text-2xl font-semibold text-white sm:text-4xl">{String(value).padStart(2, "0")}</p><p className="mt-1 text-[10px] uppercase tracking-wider text-slate-400">{label}</p></div>;
+              })}
+            </div>
+          </div>
+        )}
 
         {note && (
           <div className="coming-soon-rise mt-5 w-full max-w-xl rounded-2xl border border-amber-300/25 bg-amber-300/[0.08] px-5 py-4 text-left" style={{ animationDelay: "380ms" }}>
