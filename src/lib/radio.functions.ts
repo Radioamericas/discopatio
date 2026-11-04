@@ -14,13 +14,14 @@ type Control = {
   id: number; blocked: boolean; openOverride: boolean; unlockAt: string | null; bannerEnabled: boolean;
   bannerText: string | null; bannerPosition: "top" | "middle" | "bottom"; bannerColor: string; updatedAt: string;
   siteLocked: boolean; lockNote: string | null;
+  popupEnabled: boolean; popupTitle: string | null; popupText: string | null; popupImageUrl: string | null;
 };
 
 async function readControl(): Promise<Control> {
   const db = await getAdmin();
   const { data } = await db.from("site_control").select("*").eq("id", 1).maybeSingle();
-  const r = data ?? { id: 1, blocked: false, open_override: false, unlock_at: null, banner_enabled: false, banner_text: null, banner_position: "top" as const, banner_color: "cyan", updated_at: new Date().toISOString(), site_locked: false, lock_note: null };
-  return { id: r.id, blocked: r.blocked, openOverride: r.open_override, unlockAt: r.unlock_at, bannerEnabled: r.banner_enabled, bannerText: r.banner_text, bannerPosition: r.banner_position, bannerColor: r.banner_color, updatedAt: r.updated_at, siteLocked: r.site_locked, lockNote: r.lock_note };
+  const r = data ?? { id: 1, blocked: false, open_override: false, unlock_at: null, banner_enabled: false, banner_text: null, banner_position: "top" as const, banner_color: "cyan", updated_at: new Date().toISOString(), site_locked: false, lock_note: null, popup_enabled: false, popup_title: null, popup_text: null, popup_image_url: null };
+  return { id: r.id, blocked: r.blocked, openOverride: r.open_override, unlockAt: r.unlock_at, bannerEnabled: r.banner_enabled, bannerText: r.banner_text, bannerPosition: r.banner_position, bannerColor: r.banner_color, updatedAt: r.updated_at, siteLocked: r.site_locked, lockNote: r.lock_note, popupEnabled: r.popup_enabled, popupTitle: r.popup_title, popupText: r.popup_text, popupImageUrl: r.popup_image_url };
 }
 
 async function pauseState() {
@@ -84,6 +85,7 @@ export const getRequestStatus = createServerFn({ method: "GET" }).handler(async 
     blocked: c.blocked, openOverride: c.openOverride, bannerEnabled: c.bannerEnabled, bannerText: c.bannerText,
     bannerPosition: c.bannerPosition, bannerColor: c.bannerColor,
     siteLocked: c.siteLocked, lockNote: c.lockNote,
+    popupEnabled: c.popupEnabled, popupTitle: c.popupTitle, popupText: c.popupText, popupImageUrl: c.popupImageUrl, updatedAt: c.updatedAt,
     unlockAt: c.unlockAt ? new Date(c.unlockAt).getTime() : p.unlockAt,
   };
 });
@@ -267,6 +269,9 @@ const controlInput = z.object({
   bannerEnabled: z.boolean().optional(), bannerText: z.string().max(500).nullable().optional(),
   bannerPosition: z.enum(["top", "middle", "bottom"]).optional(), bannerColor: z.string().max(24).optional(),
   siteLocked: z.boolean().optional(), lockNote: z.string().trim().max(500).nullable().optional(),
+  popupEnabled: z.boolean().optional(), popupTitle: z.string().trim().max(120).nullable().optional(),
+  popupText: z.string().trim().max(1000).nullable().optional(),
+  popupImageUrl: z.string().max(700_000).regex(/^(data:image\/(jpeg|png|webp);base64,|https:\/\/)/).nullable().optional(),
 });
 export const ownerUpdateControl = createServerFn({ method: "POST" })
   .inputValidator((d: z.input<typeof controlInput>) => controlInput.parse(d))
@@ -284,6 +289,10 @@ export const ownerUpdateControl = createServerFn({ method: "POST" })
       ...(data.bannerColor !== undefined && { banner_color: data.bannerColor }),
       ...(data.siteLocked !== undefined && { site_locked: data.siteLocked }),
       ...(data.lockNote !== undefined && { lock_note: data.lockNote || null }),
+      ...(data.popupEnabled !== undefined && { popup_enabled: data.popupEnabled }),
+      ...(data.popupTitle !== undefined && { popup_title: data.popupTitle || null }),
+      ...(data.popupText !== undefined && { popup_text: data.popupText || null }),
+      ...(data.popupImageUrl !== undefined && { popup_image_url: data.popupImageUrl || null }),
     };
     await db.from("site_control").upsert(patch);
     return readControl();
