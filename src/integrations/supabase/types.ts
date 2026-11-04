@@ -156,6 +156,10 @@ export type Database = {
           id: number
           lock_note: string | null
           open_override: boolean
+          popup_enabled: boolean
+          popup_image_url: string | null
+          popup_text: string | null
+          popup_title: string | null
           site_locked: boolean
           unlock_at: string | null
           updated_at: string
@@ -169,6 +173,10 @@ export type Database = {
           id: number
           lock_note?: string | null
           open_override?: boolean
+          popup_enabled?: boolean
+          popup_image_url?: string | null
+          popup_text?: string | null
+          popup_title?: string | null
           site_locked?: boolean
           unlock_at?: string | null
           updated_at?: string
@@ -182,6 +190,10 @@ export type Database = {
           id?: number
           lock_note?: string | null
           open_override?: boolean
+          popup_enabled?: boolean
+          popup_image_url?: string | null
+          popup_text?: string | null
+          popup_title?: string | null
           site_locked?: boolean
           unlock_at?: string | null
           updated_at?: string

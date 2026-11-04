@@ -17,6 +17,7 @@ import { Toaster } from "@/components/ui/sonner";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import CookieConsent from "@/components/CookieConsent";
 import { ComingSoon } from "@/components/ComingSoon";
+import { PopupNotice } from "@/components/PopupNotice";
 import { isSiteLocked } from "@/lib/site-lock";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -150,13 +151,16 @@ function LockableOutlet() {
   const statusFn = useServerFn(getRequestStatus);
   const status = useQuery({ queryKey: ["site-lock-status"], queryFn: () => statusFn(), refetchInterval: 60_000 });
   const locked = isSiteLocked(pathname, Boolean(status.data?.siteLocked));
+  const d = status.data;
+  const onTeamPage = !isSiteLocked(pathname, true);
   return (
     <>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <div className={locked ? "site-lock-backdrop" : undefined} aria-hidden={locked || undefined} inert={locked}>
         <Outlet />
       </div>
-      {locked ? <ComingSoon note={status.data?.lockNote} /> : <CookieConsent />}
+      {locked ? <ComingSoon note={status.data?.lockNote} banner={status.data?.bannerEnabled ? status.data.bannerText : null} /> : <CookieConsent />}
+      {d?.popupEnabled && !onTeamPage && <PopupNotice title={d.popupTitle} text={d.popupText} image={d.popupImageUrl} version={`${d.popupTitle ?? ""}|${d.popupText ?? ""}|${d.popupImageUrl?.length ?? 0}`} />}
     </>
   );
 }
