@@ -64,7 +64,7 @@ export function ComingSoon({ note, banner, reopenAt, onReopen }: { note?: string
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-300/80">Reabrimos el {new Date(reopenAt).toLocaleString("es-ES", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</p>
             <div className="mt-3 grid grid-cols-4 gap-2" aria-live="polite">
               {([["Días", 86400000], ["Horas", 3600000], ["Min", 60000], ["Seg", 1000]] as const).map(([label, ms], i, arr) => {
-                const value = Math.floor((i === 0 ? left : left % arr[i - 1][1]) / ms);
+                const value = Math.floor((i === 0 ? left : left % (arr[i - 1]?.[1] ?? 1)) / ms);
                 return <div key={label} className="rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.07] py-3"><p className="font-mono text-2xl font-semibold text-white sm:text-4xl">{String(value).padStart(2, "0")}</p><p className="mt-1 text-[10px] uppercase tracking-wider text-slate-400">{label}</p></div>;
               })}
             </div>
