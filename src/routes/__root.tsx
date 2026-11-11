@@ -15,6 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
+import GtmLoader from "@/components/GtmLoader";
 import CookieConsent from "@/components/CookieConsent";
 import { ComingSoon } from "@/components/ComingSoon";
 import { PopupNotice } from "@/components/PopupNotice";
@@ -141,6 +142,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <Toaster theme="dark" />
       <AnalyticsTracker />
+      <GtmLoader />
       <LockableOutlet />
     </QueryClientProvider>
   );
