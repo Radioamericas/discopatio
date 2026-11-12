@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { AccountSignIn } from "@/components/radio/AccountAccess";
+import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, KeyRound, LockKeyhole, Users } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { checkAccessCode } from "@/lib/radio.functions";
@@ -11,7 +10,6 @@ const logoPath = logoAsset.url;
 const TICKER = "PRÓXIMAMENTE · RADIO PATIO LAS AMÉRICAS · NUEVA WEB DISCOPATIO";
 
 export function ComingSoon({ note, banner, reopenAt, onReopen }: { note?: string | null | undefined; banner?: string | null | undefined; reopenAt?: number | null; onReopen?: () => void }) {
-  const [signIn, setSignIn] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
   const [code, setCode] = useState("");
   const [codeMsg, setCodeMsg] = useState<string | null>(null);
@@ -38,7 +36,6 @@ export function ComingSoon({ note, banner, reopenAt, onReopen }: { note?: string
   }, [reopenAt]);
   const left = reopenAt && now !== null ? Math.max(0, reopenAt - now) : null;
   useEffect(() => { if (left === 0) onReopen?.(); }, [left === 0]);
-  const navigate = useNavigate();
   useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -129,8 +126,6 @@ export function ComingSoon({ note, banner, reopenAt, onReopen }: { note?: string
       </div>
 
       <footer className="border-t border-white/10 px-5 py-4 text-center">
-        {signIn && <div className="mx-auto mb-4 w-full max-w-sm"><AccountSignIn onDone={() => navigate({ to: "/admin" })} /></div>}
-        <button type="button" onClick={() => setSignIn(v => !v)} className="mr-4 inline-flex min-h-11 items-center text-[11px] font-medium uppercase tracking-[0.16em] text-cyan-200 hover:text-white sm:text-xs">{signIn ? "Cerrar inicio de sesión" : "Iniciar sesión (usuario o correo)"}</button>
         <Link to="/admin" className="inline-flex min-h-11 items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400 transition hover:text-cyan-200 sm:text-xs">
           <Users className="h-3.5 w-3.5" aria-hidden="true" />
           Acceso equipo y admins
