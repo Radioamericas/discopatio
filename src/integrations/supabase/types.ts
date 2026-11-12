@@ -284,18 +284,21 @@ export type Database = {
           created_at: string
           student_name: string
           used_at: string | null
+          uses_left: number
         }
         Insert: {
           code: string
           created_at?: string
           student_name: string
           used_at?: string | null
+          uses_left?: number
         }
         Update: {
           code?: string
           created_at?: string
           student_name?: string
           used_at?: string | null
+          uses_left?: number
         }
         Relationships: []
       }

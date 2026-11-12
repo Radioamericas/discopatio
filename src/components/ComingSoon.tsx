@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AccountSignIn } from "@/components/radio/AccountAccess";
-import { ArrowUpRight, LockKeyhole, Users } from "lucide-react";
+import { ArrowUpRight, KeyRound, LockKeyhole, Users } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { checkAccessCode } from "@/lib/radio.functions";
 import { INFO_URL } from "@/lib/site-lock";
 import logoAsset from "@/assets/logo_disco_patio.png.asset.json";
 
@@ -10,6 +12,23 @@ const TICKER = "PRÓXIMAMENTE · RADIO PATIO LAS AMÉRICAS · NUEVA WEB DISCOPAT
 
 export function ComingSoon({ note, banner, reopenAt, onReopen }: { note?: string | null | undefined; banner?: string | null | undefined; reopenAt?: number | null; onReopen?: () => void }) {
   const [signIn, setSignIn] = useState(false);
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [code, setCode] = useState("");
+  const [codeMsg, setCodeMsg] = useState<string | null>(null);
+  const [checking, setChecking] = useState(false);
+  const check = useServerFn(checkAccessCode);
+  const submitCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const value = code.trim().toUpperCase();
+    if (!/^[A-Z0-9]{6,21}$/.test(value)) { setCodeMsg("Escribe el código completo."); return; }
+    setChecking(true); setCodeMsg(null);
+    try {
+      const r = await check({ data: { code: value } });
+      if (!r.valid) { setCodeMsg("Código no válido o ya utilizado."); return; }
+      sessionStorage.setItem("radio-lock-code", value);
+      window.dispatchEvent(new Event("radio-lock-code"));
+    } catch { setCodeMsg("No se pudo comprobar el código."); } finally { setChecking(false); }
+  };
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
     if (!reopenAt) return;
@@ -77,6 +96,23 @@ export function ComingSoon({ note, banner, reopenAt, onReopen }: { note?: string
             <p className="mt-2 whitespace-pre-line text-sm leading-6 text-amber-50">{note}</p>
           </div>
         )}
+
+        <div className="coming-soon-rise mt-6 w-full max-w-md" style={{ animationDelay: "400ms" }}>
+          {!codeOpen ? (
+            <button type="button" onClick={() => setCodeOpen(true)} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-5 text-sm font-semibold text-cyan-100 hover:bg-cyan-300/20">
+              <KeyRound className="h-4 w-4" aria-hidden="true" />Tengo un código para enviar una canción
+            </button>
+          ) : (
+            <form onSubmit={submitCode} className="rounded-2xl border border-cyan-300/25 bg-cyan-300/[0.07] p-4 text-left">
+              <label htmlFor="lock-code" className="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-200/80">Código de acceso</label>
+              <div className="mt-2 flex gap-2">
+                <input id="lock-code" value={code} onChange={e => setCode(e.target.value)} autoFocus inputMode="text" autoComplete="off" maxLength={21} className="min-h-11 min-w-0 flex-1 rounded-xl border border-white/15 bg-[#07111f] px-3 font-mono text-lg tracking-widest text-white outline-none focus:border-cyan-300" placeholder="000000" />
+                <button type="submit" disabled={checking} className="min-h-11 rounded-xl bg-cyan-300 px-4 text-sm font-semibold text-[#07111f] hover:bg-cyan-200 disabled:opacity-60">{checking ? "…" : "Entrar"}</button>
+              </div>
+              {codeMsg && <p className="mt-2 text-xs text-amber-200" role="alert">{codeMsg}</p>}
+            </form>
+          )}
+        </div>
 
         <div className="coming-soon-rise mt-8 w-full max-w-md rounded-2xl border border-blue-200/15 bg-blue-300/[0.07] px-5 py-4" style={{ animationDelay: "430ms" }}>
           <p className="text-xs uppercase tracking-[0.22em] text-blue-200/70">Para más info visita</p>

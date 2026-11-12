@@ -144,12 +144,18 @@ export function HomePage() {
     },
     onError: (error: Error) => toast.error("No se pudo guardar la valoración", { description: error.message }),
   });
+  useEffect(() => {
+    const stored = sessionStorage.getItem("radio-lock-code");
+    if (stored) { setAccessCode(stored); setAccessUnlocked(true); }
+  }, []);
   const createRequest = useMutation({
     mutationFn: (v: Parameters<typeof createCall>[0]["data"]) => createCall({ data: v }),
     onSuccess: ({ id }) => {
       const remaining = Math.max(0, 6200 - (Date.now() - submissionLoaderStartedAt.current));
       window.setTimeout(() => { setShowSubmissionLoader(false); toast.success("¡Petición enviada!", { description: "La revisaremos para el próximo Radio Patio Las Américas." }); }, remaining);
       setFeedbackRequestId(id);
+      const stored = sessionStorage.getItem("radio-lock-code");
+      if (stored) checkCodeCall({ data: { code: stored } }).then(r => { if (!r.valid) { sessionStorage.removeItem("radio-lock-code"); setAccessUnlocked(false); setAccessCode(""); window.dispatchEvent(new Event("radio-lock-code")); } }).catch(() => {});
       setFeedbackRating(0);
       setSongTitle(""); setArtist(""); setAlbum(""); setYear(""); setRequesterName(""); setCourse(""); setDedication(""); setSelectedTrack(null); setSearchText(""); setSearchQuery(""); setTermsAccepted(false); setExplicitWarningAccepted(false); setExplicitPopupOpen(false);
     },

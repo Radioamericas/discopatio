@@ -9,7 +9,7 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -152,7 +152,14 @@ function LockableOutlet() {
   const pathname = useRouterState({ select: state => state.location.pathname });
   const statusFn = useServerFn(getRequestStatus);
   const status = useQuery({ queryKey: ["site-lock-status"], queryFn: () => statusFn(), refetchInterval: 60_000 });
-  const locked = isSiteLocked(pathname, Boolean(status.data?.siteLocked));
+  const [codeBypass, setCodeBypass] = useState(false);
+  useEffect(() => {
+    const sync = () => setCodeBypass(Boolean(sessionStorage.getItem("radio-lock-code")));
+    sync();
+    window.addEventListener("radio-lock-code", sync);
+    return () => window.removeEventListener("radio-lock-code", sync);
+  }, []);
+  const locked = isSiteLocked(pathname, Boolean(status.data?.siteLocked)) && !codeBypass;
   const d = status.data;
   const onTeamPage = !isSiteLocked(pathname, true);
   return (

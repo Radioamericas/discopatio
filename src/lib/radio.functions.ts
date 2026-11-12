@@ -183,7 +183,8 @@ export const createSongRequest = createServerFn({ method: "POST" })
     const code = data.accessCode?.toUpperCase();
     const permanentBypass = code ? isTeamCode(code) : false;
     const db = await getAdmin();
-    if ((pause.paused || pause.control.blocked) && !permanentBypass) {
+    const lockedNow = Boolean(pause.control.siteLocked);
+    if ((pause.paused || pause.control.blocked || lockedNow) && !permanentBypass) {
       if (!code) throw new Error("La página está bloqueada. Utiliza un código válido de un solo uso.");
       const fn = code.length === 6 ? "redeem_student_access_code" : "redeem_access_code";
       const { data: redeemed } = await db.rpc(fn, { _code: code });
