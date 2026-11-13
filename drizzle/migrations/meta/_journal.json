@@ -71,6 +71,13 @@
       "when": 1794521162431,
       "tag": "0009_multi_use_student_codes",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794582861862,
+      "tag": "0010_live_sessions_help_archive",
+      "breakpoints": true
     }
   ]
 }

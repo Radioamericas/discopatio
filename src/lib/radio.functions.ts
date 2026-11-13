@@ -223,7 +223,8 @@ export const updateRequest = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireTeam();
     const db = await getAdmin();
-    await db.from("song_requests").update({ status: data.status, notes: data.notes ?? null, updated_at: new Date().toISOString() }).eq("id", data.id);
+    const now = new Date().toISOString();
+    await db.from("song_requests").update({ status: data.status, notes: data.notes ?? null, updated_at: now, ...(data.status === "played" ? { played_at: now, scheduled_for: null } : data.status !== "selected" ? { scheduled_for: null } : {}) }).eq("id", data.id);
     return { success: true };
   });
 

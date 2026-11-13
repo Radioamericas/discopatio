@@ -104,6 +104,60 @@ export type Database = {
         }
         Relationships: []
       }
+      help_messages: {
+        Row: {
+          contact: string | null
+          created_at: string
+          id: number
+          message: string
+          name: string | null
+          page: string | null
+          resolved: boolean
+        }
+        Insert: {
+          contact?: string | null
+          created_at?: string
+          id?: number
+          message: string
+          name?: string | null
+          page?: string | null
+          resolved?: boolean
+        }
+        Update: {
+          contact?: string | null
+          created_at?: string
+          id?: number
+          message?: string
+          name?: string | null
+          page?: string | null
+          resolved?: boolean
+        }
+        Relationships: []
+      }
+      live_sessions: {
+        Row: {
+          closed_at: string | null
+          code: string
+          created_at: string
+          expires_at: string
+          title: string
+        }
+        Insert: {
+          closed_at?: string | null
+          code: string
+          created_at?: string
+          expires_at: string
+          title: string
+        }
+        Update: {
+          closed_at?: string | null
+          code?: string
+          created_at?: string
+          expires_at?: string
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -233,7 +287,9 @@ export type Database = {
           dedication: string | null
           id: number
           notes: string | null
+          played_at: string | null
           requester_name: string | null
+          scheduled_for: string | null
           song_title: string
           source_url: string | null
           status: Database["public"]["Enums"]["request_status"]
@@ -250,7 +306,9 @@ export type Database = {
           dedication?: string | null
           id?: number
           notes?: string | null
+          played_at?: string | null
           requester_name?: string | null
+          scheduled_for?: string | null
           song_title: string
           source_url?: string | null
           status?: Database["public"]["Enums"]["request_status"]
@@ -267,7 +325,9 @@ export type Database = {
           dedication?: string | null
           id?: number
           notes?: string | null
+          played_at?: string | null
           requester_name?: string | null
+          scheduled_for?: string | null
           song_title?: string
           source_url?: string | null
           status?: Database["public"]["Enums"]["request_status"]

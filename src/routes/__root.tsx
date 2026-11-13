@@ -19,6 +19,7 @@ import GtmLoader from "@/components/GtmLoader";
 import CookieConsent from "@/components/CookieConsent";
 import { ComingSoon } from "@/components/ComingSoon";
 import { PopupNotice } from "@/components/PopupNotice";
+import { HelpButton } from "@/components/HelpButton";
 import { isSiteLocked } from "@/lib/site-lock";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -100,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Hind:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" },
     ],
   }),
   shellComponent: RootShell,
@@ -111,7 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="es" className="dark">
+    <html lang="es">
       <head>
         <HeadContent />
       </head>
@@ -140,7 +141,7 @@ function RootComponent() {
   }, [router, queryClient]);
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster theme="dark" />
+      <Toaster theme="light" />
       <AnalyticsTracker />
       <GtmLoader />
       <LockableOutlet />
@@ -169,6 +170,7 @@ function LockableOutlet() {
         <Outlet />
       </div>
       {locked ? <ComingSoon note={status.data?.lockNote} reopenAt={status.data?.lockReopenAt ?? null} onReopen={() => status.refetch()} banner={status.data?.bannerEnabled ? status.data.bannerText : null} /> : <CookieConsent />}
+      {!locked && <HelpButton />}
       {d?.popupEnabled && !onTeamPage && <PopupNotice title={d.popupTitle} text={d.popupText} image={d.popupImageUrl} version={`${d.popupTitle ?? ""}|${d.popupText ?? ""}|${d.popupImageUrl?.length ?? 0}`} />}
     </>
   );
