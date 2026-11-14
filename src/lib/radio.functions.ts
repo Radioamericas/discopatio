@@ -123,13 +123,24 @@ export type Track = { id: string; title: string; artist: string; album: string; 
 export const searchMusic = createServerFn({ method: "GET" })
   .inputValidator((d: { query: string }) => z.object({ query: z.string().trim().min(2).max(100) }).parse(d))
   .handler(async ({ data }): Promise<Track[]> => {
+    // Deezer (free, no key) first; iTunes as fallback.
+    try {
+      const dz = await fetch(`https://api.deezer.com/search?limit=8&q=${encodeURIComponent(data.query)}`);
+      if (dz.ok) {
+        const j = (await dz.json()) as { data?: Array<{ id: number; title: string; explicit_lyrics?: boolean; link?: string; preview?: string; artist?: { name?: string }; album?: { title?: string; cover_medium?: string } }> };
+        if (j.data?.length) return j.data.map((t) => ({
+          id: `dz-${t.id}`, title: t.title, artist: t.artist?.name ?? "Artista desconocido", album: t.album?.title ?? "",
+          previewUrl: t.preview || undefined, artworkUrl: t.album?.cover_medium, sourceUrl: t.link,
+          explicitness: t.explicit_lyrics ? "explicit" : "notExplicit",
+        }));
+      }
+    } catch { /* fall back */ }
     const url = new URL("https://itunes.apple.com/search");
     url.searchParams.set("term", data.query);
     url.searchParams.set("entity", "song");
     url.searchParams.set("country", "ES");
-    url.searchParams.set("lang", "es_es");
     url.searchParams.set("limit", "8");
-    const response = await fetch(url, { headers: { "User-Agent": "DiscoPatioRadio/1.0 (IES Las Americas)" } });
+    const response = await fetch(url);
     if (!response.ok) throw new Error("No se pudo consultar el buscador musical. Prueba de nuevo.");
     const json = (await response.json()) as { results?: Array<{ trackId?: number; trackName?: string; artistName?: string; collectionName?: string; releaseDate?: string; previewUrl?: string; trackViewUrl?: string; artworkUrl100?: string; trackExplicitness?: Track["explicitness"] }> };
     return (json.results ?? []).map((t) => ({
