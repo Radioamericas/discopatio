@@ -5,7 +5,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 // Team codes live only in the TEAM_ACCESS_CODES server secret (comma-separated), never in source.
 function teamAccessCodes(): string[] {
-  return (process.env.TEAM_ACCESS_CODES ?? "")
+  return (process.env["TEAM_ACCESS_CODES"] ?? "")
     .split(",")
     .map((c) => c.trim().toUpperCase())
     .filter((c) => c.length >= 16);
