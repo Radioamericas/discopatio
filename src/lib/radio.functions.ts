@@ -1,9 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { isLikelyExplicitSong, TERMS_VERSION } from "@/lib/content-moderation";
+import { deviceCanSend, deviceWeekStart, IP_WEEK_MULTIPLIER } from "@/lib/device-limit";
 import { FIRST_OPEN_AT, REQUEST_LIMIT, nextUnlockAt, windowStart } from "@/lib/schedule";
 import {
-  getAccess, getActivityMetadata, getAdmin, getCountry, hasPublicSession, isOwnerRequest, isTeamCode,
+  getAccess, getActivityMetadata, getAdmin, getDeviceId, getIpWeekHash, getCountry, hasPublicSession, isOwnerRequest, isTeamCode,
   LEGACY_SINGLE_USE_CODE, PUBLIC_ACCESS_CODE, publicSession, teamSession,
 } from "@/lib/radio.server";
 
@@ -15,14 +16,34 @@ type Control = {
   bannerText: string | null; bannerPosition: "top" | "middle" | "bottom"; bannerColor: string; updatedAt: string;
   siteLocked: boolean; lockNote: string | null; lockReopenAt: string | null;
   popupEnabled: boolean; popupTitle: string | null; popupText: string | null; popupImageUrl: string | null;
+  perDeviceLimit: number; altOpen: boolean;
 };
 
 async function readControl(): Promise<Control> {
   const db = await getAdmin();
   const { data } = await db.from("site_control").select("*").eq("id", 1).maybeSingle();
-  const r = data ?? { id: 1, blocked: false, open_override: false, unlock_at: null, banner_enabled: false, banner_text: null, banner_position: "top" as const, banner_color: "cyan", updated_at: new Date().toISOString(), site_locked: false, lock_note: null, lock_reopen_at: null as string | null, popup_enabled: false, popup_title: null, popup_text: null, popup_image_url: null };
-  return { id: r.id, blocked: r.blocked, openOverride: r.open_override, unlockAt: r.unlock_at, bannerEnabled: r.banner_enabled, bannerText: r.banner_text, bannerPosition: r.banner_position, bannerColor: r.banner_color, updatedAt: r.updated_at, siteLocked: r.site_locked && !(r.lock_reopen_at && Date.parse(r.lock_reopen_at) <= Date.now()), lockNote: r.lock_note, lockReopenAt: r.lock_reopen_at, popupEnabled: r.popup_enabled, popupTitle: r.popup_title, popupText: r.popup_text, popupImageUrl: r.popup_image_url };
+  const r = data ?? { id: 1, blocked: false, open_override: false, unlock_at: null, banner_enabled: false, banner_text: null, banner_position: "top" as const, banner_color: "cyan", updated_at: new Date().toISOString(), site_locked: false, lock_note: null, lock_reopen_at: null as string | null, popup_enabled: false, popup_title: null, popup_text: null, popup_image_url: null, per_device_limit: 2, alt_open: true };
+  return { id: r.id, blocked: r.blocked, openOverride: r.open_override, unlockAt: r.unlock_at, bannerEnabled: r.banner_enabled, bannerText: r.banner_text, bannerPosition: r.banner_position, bannerColor: r.banner_color, updatedAt: r.updated_at, siteLocked: r.site_locked && !(r.lock_reopen_at && Date.parse(r.lock_reopen_at) <= Date.now()), lockNote: r.lock_note, lockReopenAt: r.lock_reopen_at, popupEnabled: r.popup_enabled, popupTitle: r.popup_title, popupText: r.popup_text, popupImageUrl: r.popup_image_url, perDeviceLimit: r.per_device_limit, altOpen: r.alt_open };
 }
+
+async function deviceUsage() {
+  const db = await getAdmin();
+  const deviceId = await getDeviceId();
+  const since = deviceWeekStart();
+  const ipWeekHash = await getIpWeekHash(since);
+  const sinceIso = new Date(since).toISOString();
+  const [{ count: used }, { count: ipUsed }, { data: blocked }] = await Promise.all([
+    db.from("request_activity").select("request_id", { count: "exact", head: true }).eq("device_id", deviceId).gte("created_at", sinceIso),
+    db.from("request_activity").select("request_id", { count: "exact", head: true }).eq("ip_week_hash", ipWeekHash).gte("created_at", sinceIso),
+    db.from("blocked_devices").select("device_id").eq("device_id", deviceId).maybeSingle(),
+  ]);
+  return { deviceId, ipWeekHash, used: used ?? 0, ipUsed: ipUsed ?? 0, blocked: Boolean(blocked) };
+}
+
+export const getDeviceStatus = createServerFn({ method: "GET" }).handler(async () => {
+  const [c, u] = await Promise.all([readControl(), deviceUsage()]);
+  return { used: u.used, limit: c.perDeviceLimit, blocked: u.blocked, altOpen: c.altOpen, canSend: !u.blocked && deviceCanSend(u.used, c.perDeviceLimit) };
+});
 
 async function pauseState() {
   const now = Date.now();
@@ -183,6 +204,7 @@ const requestInput = z.object({
   termsVersion: z.literal(TERMS_VERSION),
   explicitWarningAccepted: z.boolean().default(false),
   accessCode: z.string().trim().regex(/^[A-Z0-9]{6,21}$/i, "El código no tiene un formato válido").optional(),
+  alt: z.boolean().optional(),
 });
 
 export const createSongRequest = createServerFn({ method: "POST" })
@@ -195,7 +217,15 @@ export const createSongRequest = createServerFn({ method: "POST" })
     const permanentBypass = code ? isTeamCode(code) : false;
     const db = await getAdmin();
     const lockedNow = Boolean(pause.control.siteLocked);
-    if ((pause.paused || pause.control.blocked || lockedNow) && !permanentBypass) {
+    const usage = await deviceUsage();
+    if (!permanentBypass) {
+      if (usage.blocked) throw new Error("Este dispositivo está bloqueado por uso indebido del buzón.");
+      const limit = pause.control.perDeviceLimit;
+      if (!deviceCanSend(usage.used, limit)) throw new Error(`Ya has enviado ${limit} ${limit === 1 ? "canción" : "canciones"} esta semana. Vuelve el jueves.`);
+      if (!deviceCanSend(usage.ipUsed, limit * IP_WEEK_MULTIPLIER)) throw new Error("Se han enviado demasiadas canciones desde esta conexión esta semana.");
+    }
+    const altBypass = data.alt === true && pause.control.altOpen;
+    if ((pause.paused || pause.control.blocked || lockedNow) && !permanentBypass && !altBypass) {
       if (!code) throw new Error("La página está bloqueada. Utiliza un código válido de un solo uso.");
       const fn = code.length === 6 ? "redeem_student_access_code" : "redeem_access_code";
       const { data: redeemed } = await db.rpc(fn, { _code: code });
@@ -207,7 +237,7 @@ export const createSongRequest = createServerFn({ method: "POST" })
       source_url: data.sourceUrl ?? null, terms_accepted: true, terms_version: data.termsVersion, status: "pending",
     }).select("id").single();
     if (error || !row) throw new Error("No se pudo guardar la petición.");
-    await db.from("request_activity").insert({ request_id: row.id, ...(await getActivityMetadata()), access_code_used: Boolean(code) });
+    await db.from("request_activity").insert({ request_id: row.id, ...(await getActivityMetadata()), access_code_used: Boolean(code), device_id: usage.deviceId, ip_week_hash: usage.ipWeekHash });
     return { success: true, id: row.id };
   });
 
@@ -284,6 +314,7 @@ const controlInput = z.object({
   siteLocked: z.boolean().optional(), lockNote: z.string().trim().max(500).nullable().optional(), lockReopenAt: z.string().datetime().nullable().optional(),
   popupEnabled: z.boolean().optional(), popupTitle: z.string().trim().max(120).nullable().optional(),
   popupText: z.string().trim().max(1000).nullable().optional(),
+  perDeviceLimit: z.number().int().min(1).max(20).optional(), altOpen: z.boolean().optional(),
   popupImageUrl: z.string().max(700_000).regex(/^(data:image\/(jpeg|png|webp);base64,|https:\/\/)/).nullable().optional(),
 });
 export const ownerUpdateControl = createServerFn({ method: "POST" })
@@ -307,6 +338,8 @@ export const ownerUpdateControl = createServerFn({ method: "POST" })
       ...(data.popupTitle !== undefined && { popup_title: data.popupTitle || null }),
       ...(data.popupText !== undefined && { popup_text: data.popupText || null }),
       ...(data.popupImageUrl !== undefined && { popup_image_url: data.popupImageUrl || null }),
+      ...(data.perDeviceLimit !== undefined && { per_device_limit: data.perDeviceLimit }),
+      ...(data.altOpen !== undefined && { alt_open: data.altOpen }),
     };
     await db.from("site_control").upsert(patch);
     return readControl();
@@ -337,3 +370,34 @@ export const ownerAnalytics = createServerFn({ method: "GET" }).handler(async ()
   const { data } = await db.rpc("analytics_summary");
   return (data ?? []).map((r) => ({ day: r.day, page: r.page, eventType: r.event_type, views: Number(r.views), totalSeconds: Number(r.total_seconds), clicks: Number(r.clicks), country: r.country, deviceType: r.device_type }));
 });
+
+// ---------- Devices (team view, owner blocks) ----------
+export const teamListDevices = createServerFn({ method: "GET" }).handler(async () => {
+  await requireTeam();
+  const db = await getAdmin();
+  const since = new Date(deviceWeekStart()).toISOString();
+  const [{ data: acts }, { data: blocked }] = await Promise.all([
+    db.from("request_activity").select("device_id, device_type, browser, created_at").not("device_id", "is", null).gte("created_at", since).limit(2000),
+    db.from("blocked_devices").select("device_id"),
+  ]);
+  const blockedSet = new Set((blocked ?? []).map((b) => b.device_id));
+  const map = new Map<string, { deviceId: string; count: number; deviceType: string | null; browser: string | null; last: string }>();
+  for (const a of acts ?? []) {
+    const id = a.device_id!;
+    const cur = map.get(id) ?? { deviceId: id, count: 0, deviceType: a.device_type, browser: a.browser, last: a.created_at };
+    cur.count += 1; if (a.created_at > cur.last) cur.last = a.created_at;
+    map.set(id, cur);
+  }
+  for (const id of blockedSet) if (!map.has(id)) map.set(id, { deviceId: id, count: 0, deviceType: null, browser: null, last: "" });
+  return [...map.values()].map((d) => ({ ...d, blocked: blockedSet.has(d.deviceId) })).sort((a, b) => b.count - a.count);
+});
+
+export const ownerSetDeviceBlocked = createServerFn({ method: "POST" })
+  .inputValidator((d: { deviceId: string; blocked: boolean }) => z.object({ deviceId: z.string().uuid(), blocked: z.boolean() }).parse(d))
+  .handler(async ({ data }) => {
+    await requireOwner();
+    const db = await getAdmin();
+    if (data.blocked) await db.from("blocked_devices").upsert({ device_id: data.deviceId });
+    else await db.from("blocked_devices").delete().eq("device_id", data.deviceId);
+    return { success: true };
+  });

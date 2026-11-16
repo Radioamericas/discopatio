@@ -104,6 +104,24 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_devices: {
+        Row: {
+          created_at: string
+          device_id: string
+          note: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          note?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          note?: string | null
+        }
+        Relationships: []
+      }
       help_messages: {
         Row: {
           contact: string | null
@@ -180,28 +198,38 @@ export type Database = {
         Row: {
           access_code_used: boolean
           browser: string | null
+          created_at: string
+          device_id: string | null
           device_type: string | null
           ip_hash: string | null
+          ip_week_hash: string | null
           request_id: number
         }
         Insert: {
           access_code_used?: boolean
           browser?: string | null
+          created_at?: string
+          device_id?: string | null
           device_type?: string | null
           ip_hash?: string | null
+          ip_week_hash?: string | null
           request_id: number
         }
         Update: {
           access_code_used?: boolean
           browser?: string | null
+          created_at?: string
+          device_id?: string | null
           device_type?: string | null
           ip_hash?: string | null
+          ip_week_hash?: string | null
           request_id?: number
         }
         Relationships: []
       }
       site_control: {
         Row: {
+          alt_open: boolean
           banner_color: string
           banner_enabled: boolean
           banner_position: Database["public"]["Enums"]["banner_position"]
@@ -211,6 +239,7 @@ export type Database = {
           lock_note: string | null
           lock_reopen_at: string | null
           open_override: boolean
+          per_device_limit: number
           popup_enabled: boolean
           popup_image_url: string | null
           popup_text: string | null
@@ -220,6 +249,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          alt_open?: boolean
           banner_color?: string
           banner_enabled?: boolean
           banner_position?: Database["public"]["Enums"]["banner_position"]
@@ -229,6 +259,7 @@ export type Database = {
           lock_note?: string | null
           lock_reopen_at?: string | null
           open_override?: boolean
+          per_device_limit?: number
           popup_enabled?: boolean
           popup_image_url?: string | null
           popup_text?: string | null
@@ -238,6 +269,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          alt_open?: boolean
           banner_color?: string
           banner_enabled?: boolean
           banner_position?: Database["public"]["Enums"]["banner_position"]
@@ -247,6 +279,7 @@ export type Database = {
           lock_note?: string | null
           lock_reopen_at?: string | null
           open_override?: boolean
+          per_device_limit?: number
           popup_enabled?: boolean
           popup_image_url?: string | null
           popup_text?: string | null

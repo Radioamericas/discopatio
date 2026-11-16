@@ -11,7 +11,7 @@ export const SITE_LOCKED = false;
 export const INFO_URL = "https://discopatio.lovable.app";
 
 /** Paths that keep working while the site is locked. */
-const TEAM_PATH_PREFIXES = ["/admin", "/reset-password", "/s"];
+const TEAM_PATH_PREFIXES = ["/admin", "/reset-password", "/s", "/alt"];
 
 export function isSiteLocked(pathname: string, lockedFromPanel = false): boolean {
   if (!SITE_LOCKED && !lockedFromPanel) return false;

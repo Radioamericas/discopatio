@@ -14,3 +14,4 @@
 - Account management lives in src/lib/team-accounts.functions.ts with authenticated role checks before privileged operations; a signup trigger accepts only trusted app_metadata set by owner provisioning and automatic first-owner assignment is disabled, preventing public registration escalation.
 - Team credential helpers normalize usernames into reserved synthetic emails; owner provisioning confirms these undeliverable addresses individually, without changing global email confirmation settings.
 - The public site's frozen/coming-soon state is driven only by SITE_LOCKED in src/lib/site-lock.ts, so reopening the site is a one-flag change and /admin is never locked out.
+- Do not rely on the per-day ip_hash for weekly counting; per-device weekly limits use the signed device cookie plus a weekly-salted IP hash in request_activity.

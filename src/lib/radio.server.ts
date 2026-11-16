@@ -29,6 +29,24 @@ export const teamSession = () =>
 export const publicSession = () =>
   useSession<{ granted?: boolean }>(sessionConfig("disco_patio_public_access", 60 * 60 * 24 * 365));
 
+export const deviceSession = () =>
+  useSession<{ id?: string }>(sessionConfig("disco_patio_device", 60 * 60 * 24 * 365));
+
+/** Anonymous per-browser id kept in a signed cookie, created on first use. */
+export async function getDeviceId() {
+  const s = await deviceSession();
+  if (s.data.id) return s.data.id;
+  const id = crypto.randomUUID();
+  await s.update({ id });
+  return id;
+}
+
+/** IP hash salted per device-limit week (not per day), so a week can be counted. */
+export async function getIpWeekHash(weekStart: number) {
+  const ip = String(getRequestHeader("cf-connecting-ip") ?? getRequestHeader("x-forwarded-for") ?? "unknown").split(",")[0]?.trim() ?? "unknown";
+  return (await sha256Hex(`${process.env["SESSION_SECRET"] ?? "activity-salt"}|week|${weekStart}|${ip}`)).slice(0, 32);
+}
+
 export async function hasTeamSession() {
   const s = await teamSession();
   return s.data.team === true;

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AltRouteImport } from './routes/alt'
 import { Route as AvisoLegalRouteImport } from './routes/aviso-legal'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
@@ -25,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AltRoute = AltRouteImport.update({
+  id: '/alt',
+  path: '/alt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AvisoLegalRoute = AvisoLegalRouteImport.update({
@@ -56,6 +62,7 @@ const SCodeRoute = SCodeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alt': typeof AltRoute
   '/aviso-legal': typeof AvisoLegalRoute
   '/cookies': typeof CookiesRoute
   '/privacidad': typeof PrivacidadRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alt': typeof AltRoute
   '/aviso-legal': typeof AvisoLegalRoute
   '/cookies': typeof CookiesRoute
   '/privacidad': typeof PrivacidadRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/alt': typeof AltRoute
   '/aviso-legal': typeof AvisoLegalRoute
   '/cookies': typeof CookiesRoute
   '/privacidad': typeof PrivacidadRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/alt'
     | '/aviso-legal'
     | '/cookies'
     | '/privacidad'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/alt'
     | '/aviso-legal'
     | '/cookies'
     | '/privacidad'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/alt'
     | '/aviso-legal'
     | '/cookies'
     | '/privacidad'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AltRoute: typeof AltRoute
   AvisoLegalRoute: typeof AvisoLegalRoute
   CookiesRoute: typeof CookiesRoute
   PrivacidadRoute: typeof PrivacidadRoute
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alt': {
+      id: '/alt'
+      path: '/alt'
+      fullPath: '/alt'
+      preLoaderRoute: typeof AltRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/aviso-legal': {
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AltRoute: AltRoute,
   AvisoLegalRoute: AvisoLegalRoute,
   CookiesRoute: CookiesRoute,
   PrivacidadRoute: PrivacidadRoute,
