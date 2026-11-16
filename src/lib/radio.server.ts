@@ -3,14 +3,19 @@ import { createClient } from "@supabase/supabase-js";
 import { getRequestHeader, useSession } from "@tanstack/react-start/server";
 import type { Database } from "@/integrations/supabase/types";
 
-// Permanent team codes (kept from the original app).
-export const TEAM_ACCESS_CODES = ["4719RADIEROS2026", "VZXT5D4YGB0XR90P1F62F", "RCQAIM5CF8KCBT90OJ"] as const;
+// Team codes live only in the TEAM_ACCESS_CODES server secret (comma-separated), never in source.
+function teamAccessCodes(): string[] {
+  return (process.env.TEAM_ACCESS_CODES ?? "")
+    .split(",")
+    .map((c) => c.trim().toUpperCase())
+    .filter((c) => c.length >= 16);
+}
 export const LEGACY_SINGLE_USE_CODE = "NV4SXULY75CS1DABNGXD0";
 export const PUBLIC_ACCESS_CODE = "JUEVES";
 
 export function isTeamCode(value: string) {
   const v = value.trim().toUpperCase();
-  return TEAM_ACCESS_CODES.some((c) => c === v);
+  return teamAccessCodes().some((c) => c === v);
 }
 
 function sessionConfig(name: string, maxAge: number) {
