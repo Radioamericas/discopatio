@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, KeyRound, LockKeyhole, Users } from "lucide-react";
+import { ArrowUpRight, KeyRound, LockKeyhole, Megaphone, Users } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { checkAccessCode } from "@/lib/radio.functions";
 import { INFO_URL } from "@/lib/site-lock";
@@ -126,7 +126,8 @@ export function ComingSoon({ note, banner, reopenAt, onReopen }: { note?: string
       </div>
 
       <div className="px-5 pb-4 text-center">
-        <Link to="/alt" className="inline-flex min-h-11 items-center rounded-full border border-cyan-300/30 bg-cyan-300/10 px-5 text-sm font-semibold text-cyan-100 hover:bg-cyan-300/20">Buzón alternativo</Link>
+        <Link to="/avisos" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-5 text-sm font-semibold text-cyan-100 hover:bg-cyan-300/20"><Megaphone className="h-4 w-4" aria-hidden="true" />Avisos y biblioteca de audios<span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-amber-200">Beta</span></Link>
+        <Link to="/alt" className="mt-3 inline-flex min-h-11 items-center rounded-full border border-cyan-300/30 bg-cyan-300/10 px-5 text-sm font-semibold text-cyan-100 hover:bg-cyan-300/20">Buzón alternativo</Link>
       </div>
       <footer className="border-t border-white/10 px-5 py-4 text-center">
         <Link to="/admin" className="inline-flex min-h-11 items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400 transition hover:text-cyan-200 sm:text-xs">

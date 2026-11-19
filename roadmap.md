@@ -6,3 +6,5 @@
 
 # Pendiente
 - [ ] Publicar la web para que lo nuevo se vea en discopatio.lovable.app.
+- [ ] Unificar la base de datos en Supabase: que avisos/audios y Discopatio compartan los mismos datos.
+- [ ] Conectar la web externa de avisos a esta base de datos mediante un enlace público de datos.

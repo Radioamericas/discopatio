@@ -104,6 +104,45 @@ export type Database = {
         }
         Relationships: []
       }
+      avisos: {
+        Row: {
+          body: string
+          created_at: string
+          expires_at: string | null
+          id: number
+          kind: string
+          pinned: boolean
+          publish_at: string | null
+          published: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          expires_at?: string | null
+          id?: number
+          kind?: string
+          pinned?: boolean
+          publish_at?: string | null
+          published?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: number
+          kind?: string
+          pinned?: boolean
+          publish_at?: string | null
+          published?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blocked_devices: {
         Row: {
           created_at: string
@@ -191,6 +230,42 @@ export type Database = {
           created_at?: string
           id?: string
           username?: string
+        }
+        Relationships: []
+      }
+      program_audios: {
+        Row: {
+          audio_url: string
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          id: number
+          program_date: string | null
+          published: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: number
+          program_date?: string | null
+          published?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: number
+          program_date?: string | null
+          published?: boolean
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

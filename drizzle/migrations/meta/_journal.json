@@ -85,6 +85,13 @@
       "when": 1794843404432,
       "tag": "0011_device_weekly_limit",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1795113137159,
+      "tag": "0012_avisos_y_audios_library",
+      "breakpoints": true
     }
   ]
 }

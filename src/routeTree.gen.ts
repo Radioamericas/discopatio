@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AltRouteImport } from './routes/alt'
 import { Route as AvisoLegalRouteImport } from './routes/aviso-legal'
+import { Route as AvisosRouteImport } from './routes/avisos'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -36,6 +37,11 @@ const AltRoute = AltRouteImport.update({
 const AvisoLegalRoute = AvisoLegalRouteImport.update({
   id: '/aviso-legal',
   path: '/aviso-legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AvisosRoute = AvisosRouteImport.update({
+  id: '/avisos',
+  path: '/avisos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CookiesRoute = CookiesRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/alt': typeof AltRoute
   '/aviso-legal': typeof AvisoLegalRoute
+  '/avisos': typeof AvisosRoute
   '/cookies': typeof CookiesRoute
   '/privacidad': typeof PrivacidadRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/alt': typeof AltRoute
   '/aviso-legal': typeof AvisoLegalRoute
+  '/avisos': typeof AvisosRoute
   '/cookies': typeof CookiesRoute
   '/privacidad': typeof PrivacidadRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/alt': typeof AltRoute
   '/aviso-legal': typeof AvisoLegalRoute
+  '/avisos': typeof AvisosRoute
   '/cookies': typeof CookiesRoute
   '/privacidad': typeof PrivacidadRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/alt'
     | '/aviso-legal'
+    | '/avisos'
     | '/cookies'
     | '/privacidad'
     | '/reset-password'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/alt'
     | '/aviso-legal'
+    | '/avisos'
     | '/cookies'
     | '/privacidad'
     | '/reset-password'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/alt'
     | '/aviso-legal'
+    | '/avisos'
     | '/cookies'
     | '/privacidad'
     | '/reset-password'
@@ -128,6 +140,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AltRoute: typeof AltRoute
   AvisoLegalRoute: typeof AvisoLegalRoute
+  AvisosRoute: typeof AvisosRoute
   CookiesRoute: typeof CookiesRoute
   PrivacidadRoute: typeof PrivacidadRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/aviso-legal'
       fullPath: '/aviso-legal'
       preLoaderRoute: typeof AvisoLegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/avisos': {
+      id: '/avisos'
+      path: '/avisos'
+      fullPath: '/avisos'
+      preLoaderRoute: typeof AvisosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cookies': {
@@ -200,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AltRoute: AltRoute,
   AvisoLegalRoute: AvisoLegalRoute,
+  AvisosRoute: AvisosRoute,
   CookiesRoute: CookiesRoute,
   PrivacidadRoute: PrivacidadRoute,
   ResetPasswordRoute: ResetPasswordRoute,

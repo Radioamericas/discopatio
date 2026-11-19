@@ -1,0 +1,10 @@
+CREATE TABLE public.avisos (id bigserial PRIMARY KEY, title text NOT NULL, body text NOT NULL, kind text NOT NULL DEFAULT 'aviso' CHECK (kind IN ('aviso','norma','programa')), pinned boolean NOT NULL DEFAULT false, published boolean NOT NULL DEFAULT true, publish_at timestamptz, expires_at timestamptz, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.avisos TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.avisos_id_seq TO service_role;
+ALTER TABLE public.avisos ENABLE ROW LEVEL SECURITY;
+CREATE INDEX avisos_visible_idx ON public.avisos (published, pinned, created_at DESC);
+CREATE TABLE public.program_audios (id bigserial PRIMARY KEY, title text NOT NULL, program_date date, description text, audio_url text NOT NULL, duration_seconds integer, published boolean NOT NULL DEFAULT true, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.program_audios TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.program_audios_id_seq TO service_role;
+ALTER TABLE public.program_audios ENABLE ROW LEVEL SECURITY;
+CREATE INDEX program_audios_visible_idx ON public.program_audios (published, program_date DESC);

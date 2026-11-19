@@ -313,3 +313,67 @@
   .coming-soon-ticker-track { animation: none; }
   .migration-marquee-track { animation-duration: 60s; }
 }
+
+/* ---- Fanzine cards: panel tools, live session, help form ---- */
+.zine-card {
+  border-radius: 1.5rem;
+  border: 1px solid color-mix(in oklch, var(--primary) 22%, transparent);
+  background: oklch(0.17 0.035 245 / 0.92);
+  box-shadow: 0 20px 45px -28px rgb(0 0 0 / 0.85);
+  color: var(--foreground);
+}
+.zine-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+.zine-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--primary) 30%, transparent);
+  background: color-mix(in oklch, var(--primary) 12%, transparent);
+  padding: 0.15rem 0.55rem;
+  font-family: "DM Mono", ui-monospace, monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--primary);
+}
+.zine-input {
+  border-radius: 0.9rem;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.9rem;
+}
+.zine-input::placeholder { color: var(--muted-foreground); }
+.zine-input:focus-visible {
+  outline: none;
+  border-color: color-mix(in oklch, var(--primary) 60%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 25%, transparent);
+}
+.zine-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--foreground) 7%, transparent);
+  color: var(--foreground);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+.zine-btn:hover { background: color-mix(in oklch, var(--foreground) 13%, transparent); }
+.zine-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.zine-btn-primary {
+  border-color: transparent;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.zine-btn-primary:hover { background: color-mix(in oklch, var(--primary) 85%, white); }

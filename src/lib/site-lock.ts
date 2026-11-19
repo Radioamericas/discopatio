@@ -10,8 +10,11 @@ export const SITE_LOCKED = false;
 /** Where visitors are sent for more information. */
 export const INFO_URL = "https://discopatio.lovable.app";
 
+/** Avisos + provisional audio library of past Discopatio programs (beta). */
+export const AVISOS_URL = "https://avisosdiscopatio.lovable.app";
+
 /** Paths that keep working while the site is locked. */
-const TEAM_PATH_PREFIXES = ["/admin", "/reset-password", "/s", "/alt"];
+const TEAM_PATH_PREFIXES = ["/admin", "/reset-password", "/s", "/alt", "/avisos"];
 
 export function isSiteLocked(pathname: string, lockedFromPanel = false): boolean {
   if (!SITE_LOCKED && !lockedFromPanel) return false;
